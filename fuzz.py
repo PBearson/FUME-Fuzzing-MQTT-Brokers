@@ -13,15 +13,27 @@ import globals as g
 
 import markov_model as mm
 
+import helper_functions.print_verbosity as pv
+
 # Run the fuzzing engine (indefinitely)
 def run_fuzzing_engine(mm):
-    # TODO select generation or mutation,
-    # then modify the markov model accordingly
+    
+    # Select model type
+    model_types = ['mutation', 'generation']
+    model_type = random.choices(model_types, weights=[g.CHOOSE_MUTATION, 1 - g.CHOOSE_MUTATION])[0]
+    pv.verbose_print("Selected model type %s" % model_type)
 
+    if model_type == 'mutation':
+        mm.state_s0.next = [mm.state_response_log, mm.state_connect]
+        mm.state_s0.next_prob = [g.b, 1 - g.b]
+    else:
+        mm.state_s0.next = [mm.state_connect]
+        mm.state_s0.next_prob = [1]
+
+    pv.verbose_print("In state %s" % mm.current_state.name)
     while mm.current_state.name != 'Sf':
         mm.next_state()
-        if g.VERBOSITY == 2:
-            print("In state %s" % mm.current_state.name)
+        pv.verbose_print("In state %s" % mm.current_state.name)
 
 def RND(x):
     return round(x)
