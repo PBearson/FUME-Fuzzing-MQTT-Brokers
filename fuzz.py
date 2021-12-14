@@ -6,12 +6,12 @@ sys.path.append('generators')
 from generators.auth import Auth
 
 # Markov variables
-X1 = 0
-X2 = 0
-X3 = 0
+X1 = 0.5
+X2 = 0.5
+X3 = 1
 b = 0.5
-c = (1/15) * 15
-d = (1/3, 1/3, 1/3, 1/2)
+c = [1/15] * 15
+d = [1/3, 1/3, 1/3, 1/2]
 
 # Configuration variables
 CHOOSE_MUTATION = 0.5
@@ -21,6 +21,75 @@ FUZZING_STATE_UNIFORM_DISTRIBUTION = 1
 # Other parameters
 FUZZING_INTENSITY = 0.1
 CONSTRUCTION_INTENSITY = 3
+
+# CONSTRUCTION_INTENSITY must be a non-negative integer
+def validate_construction_intensity():
+    global CONSTRUCTION_INTENSITY
+    assert int(CONSTRUCTION_INTENSITY) == CONSTRUCTION_INTENSITY
+    assert CONSTRUCTION_INTENSITY >= 0
+
+# FUZZING_INTENSITY must be in the range [0...1]
+def validate_fuzzing_intensity():
+    global FUZZING_INTENSITY
+    assert FUZZING_INTENSITY >= 0 and FUZZING_INTENSITY <= 1
+
+# FUZZING_STATE_UNIFORM_DISTRIBUTION must be binary
+def validate_fuzzing_state_uniform_distribution():
+    global FUZZING_STATE_UNIFORM_DISTRIBUTION
+    assert FUZZING_STATE_UNIFORM_DISTRIBUTION in [0, 1]
+
+# PACKET_SELECTION_UNFIROM_DISTRIBUTION must be binary
+def validate_packet_selection_uniform_distribution():
+    global PACKET_SELECTION_UNIFORM_DISTRIBUTION
+    assert PACKET_SELECTION_UNIFORM_DISTRIBUTION in [0, 1]
+
+# CHOOSE_MUTATION must be in the range [0...1]
+def validate_choose_mutation():
+    global CHOOSE_MUTATION
+    assert CHOOSE_MUTATION <= 1 and CHOOSE_MUTATION >= 0
+
+# X1, X2, and X3 must be in the range [0...1]
+def validate_X():
+    global X1, X2, X3
+    assert X1 <= 1 and X1 >= 0
+    assert X2 <= 1 and X2 >= 0
+    assert X3 <= 1 and X3 >= 0
+
+# b must be in the range [0...1]
+def validate_b():
+    global b
+    assert b <= 1 and b >= 0
+
+# The values in c must sum to 1
+def validate_c():
+    global c
+    sum = 0
+    for ci in c:
+        sum += ci
+    assert abs(sum - 1) < 0.00001 
+
+# The first 3 values in c must sum to 1
+# The last value in d must be in the range [0...1]
+def validate_d():
+    global d
+    sum = 0
+    for di in d[0:3]:
+        sum += di
+    assert abs(sum - 1) < 0.00001 
+    assert d[3] <= 1 and d[3] >= 0
+
+# Validate all parameters of the fuzzing engine
+def validate_all():
+    validate_X()
+    validate_b()
+    validate_c()
+    validate_d()
+    validate_choose_mutation()
+    validate_packet_selection_uniform_distribution()
+    validate_fuzzing_state_uniform_distribution()
+    validate_fuzzing_intensity()
+    validate_construction_intensity()
+
 
 def RND(x):
     return round(x)
@@ -55,6 +124,10 @@ def parse_config_file(config):
     global CHOOSE_MUTATION
     global PACKET_SELECTION_UNIFORM_DISTRIBUTION
     global FUZZING_STATE_UNIFORM_DISTRIBUTION
+    global b
+    global c
+    global d
+
     for line in config:
         # Only valid key-value pairs
         line = line.strip()
@@ -70,11 +143,14 @@ def parse_config_file(config):
         if arg[0] == 'CHOOSE_MUTATION':
             CHOOSE_MUTATION = float(arg[1])
 
-        if arg[0] == 'PACKET_SELECTION_UNIFORM_DISTRIBUTION':
+        elif arg[0] == 'PACKET_SELECTION_UNIFORM_DISTRIBUTION':
             PACKET_SELECTION_UNIFORM_DISTRIBUTION = int(arg[1])
 
-        if arg[0] == 'FUZZING_STATE_UNIFORM_DISTRIBUTION':
+        elif arg[0] == 'FUZZING_STATE_UNIFORM_DISTRIBUTION':
             FUZZING_STATE_UNIFORM_DISTRIBUTION = int(arg[1])
+
+        elif arg[0] == 'b':
+            b = float(arg[1])
         
 
 def main():
@@ -85,10 +161,9 @@ def main():
         parse_config_file(config)
         config_f.close()
     except (FileNotFoundError, IndexError):
-        print("Please provide a valid config file")
-        exit(-1)
+        pass
 
-    print(PACKET_SELECTION_UNIFORM_DISTRIBUTION)
+    validate_all()
 
     # calculate_X1()
     # calculate_X2()
