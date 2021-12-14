@@ -1,2 +1,85 @@
 # A sample configuration file. All options are key-value pairs, separated by =.
 
+# Probability of choosing mutation-guided fuzzing
+CHOOSE_MUTATION = 0.5
+
+# If set to 1, then we assume b = 0.5 and ci = 1/15 for (c1, ..., c15).
+PACKET_SELECTION_UNIFORM_DISTRIBUTION = 1
+
+# If set to 1, then we assume di = 1/3 for (d1, d2, d3) and d4 = 0.5.
+FUZZING_STATE_UNIFORM_DISTRIBUTION = 1
+
+# Probability of selecting/generating seed input from response log 
+b = 0.5
+
+# Probability of selecting CONNECT packet
+# c1 = 1/15
+
+# Probability of selecting/generating DISCONNECT packet
+# c2 = 1/15
+
+# Probability of selecting/generating PUBLISH packet
+# c3 = 1/15
+
+# Probability of selecting/generating PUBAKC packet
+# c4 = 1/15
+
+# Probability of selecting/generating PUBREC packet
+# c5 = 1/15
+
+# Probability of selecting/generating PUBREL packet
+# c6 = 1/15
+
+# Probability of selecting/generating PUBCOMP packet
+# c7 = 1/15
+
+# Probability of selecting/generating SUBSCRIBE packet
+# c8 = 1/15
+
+# Probability of selecting/generating SUBACK packet
+# c9 = 1/15
+
+# Probability of selecting/generating UNSUBSCRIBE packet
+# c10 = 1/15
+
+# Probability of selecting/generating UNSUBACK packet
+# c11 = 1/15
+
+# Probability of selecting/generating PINGREQ packet
+# c12 = 1/15
+
+# Probability of selecting/generating PINGRESP packet
+# c13 = 1/15
+
+# Probability of selecting/generating/generating DISCONNECT packet
+# c14 = 1/15
+
+# Probability of selecting/generating/generating AUTH packet
+# c15 = 1/15
+
+# Probability of selecting the Inject fuzzing state
+# d1 = 1/3
+
+# Probability of selecting the Delete fuzzing state
+# d2 = 1/3
+
+# Probability of selecting the Mutate fuzzing state
+# d3 = 1/3
+
+# Probability of selecting the BOF fuzzing state
+# d4 = 1/3
+
+# Probability of transitioning from state S1 to state S2
+# X1 = 0.1
+
+# Probability of transitioning from state S2 to state Send
+# X2 = 0.1
+
+# Probability of transitioning from state Send to state Sf
+# X3 = 0.1
+
+# Determines the percentage of bytes that should be fuzzed
+FUZZING_INTENSITY = 0.1
+
+# Determines the maximum number of MQTT packets in a single payload
+CONSTRUCTION_INTENSITY = 3
