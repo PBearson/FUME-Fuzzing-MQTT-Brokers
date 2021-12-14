@@ -23,13 +23,13 @@ b = 0.5
 ### Probability of selecting CONNECT packet
 # c1 = 1/15
 
-### Probability of selecting/generating DISCONNECT packet
+### Probability of selecting/generating CONNACK packet
 # c2 = 1/15
 
 ### Probability of selecting/generating PUBLISH packet
 # c3 = 1/15
 
-### Probability of selecting/generating PUBAKC packet
+### Probability of selecting/generating PUBACK packet
 # c4 = 1/15
 
 ### Probability of selecting/generating PUBREC packet
