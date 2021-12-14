@@ -47,6 +47,11 @@ def validate_d():
     assert abs(sum - 1) < 0.00001 
     assert g.d[3] <= 1 and g.d[3] >= 0
 
+# VERBOSITY an integer in the range [0...2]
+def validate_verbosity():
+    assert int(g.VERBOSITY) == g.VERBOSITY
+    assert g.VERBOSITY >= 0 and g.VERBOSITY <= 2
+
 # Validate all parameters of the fuzzing engine
 def validate_all():
     validate_X()
@@ -58,3 +63,4 @@ def validate_all():
     validate_fuzzing_state_uniform_distribution()
     validate_fuzzing_intensity()
     validate_construction_intensity()
+    validate_verbosity()

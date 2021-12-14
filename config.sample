@@ -91,3 +91,12 @@ FUZZING_INTENSITY = 0.1
 
 ### Determines the maximum number of MQTT packets in a single payload
 CONSTRUCTION_INTENSITY = 3
+
+### Set the target address 
+TARGET_ADDR = 0.0.0.0
+
+### Set the target port
+TARGET_PORT = 1883
+
+### Set the verbosity - 0 (mute), 1 (normal), 2 (verbose)
+VERBOSITY = 1

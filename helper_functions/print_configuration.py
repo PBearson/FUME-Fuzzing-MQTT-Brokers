@@ -2,11 +2,19 @@ import globals as g
 
 # Print configuration parameters
 def print_configuration():
+    if g.VERBOSITY == 0:
+        return
+
     print("----------------------------------------------")
     print("-------- Fuzzing Engine Configuration --------")
+    print("TARGET_ADDR: %s" % g.TARGET_ADDR)
+    print("TARGET_PORT: %s" % g.TARGET_PORT)
     print("X1: %s" % g.X1)
     print("X2: %s" % g.X2)
     print("X3: %s" % g.X3)
+
+    if g.VERBOSITY == 1:
+        return
     print("CHOOSE_MUTATION: %s" % g.CHOOSE_MUTATION)
     print("PACKET_SELECTION_UNIFORM_DISTRIBUTION: %s" % g.PACKET_SELECTION_UNIFORM_DISTRIBUTION)
     print("FUZZING_STATE_UNIFORM_DISTRIBUTION: %s" % g.FUZZING_STATE_UNIFORM_DISTRIBUTION)

@@ -55,3 +55,12 @@ def parse_config_file(config):
             assert arg[0][1:] in [str(i) for i in range(1, 5)]
             index = int(arg[0][1:]) - 1
             g.d[index] = float(arg[1])
+
+        elif arg[0] == 'TARGET_ADDR':
+            g.TARGET_ADDR = arg[1]
+
+        elif arg[0] == 'TARGET_PORT':
+            g.TARGET_PORT = int(arg[1])
+
+        elif arg[0] == 'VERBOSITY':
+            g.VERBOSITY = int(arg[1])

@@ -6,6 +6,10 @@ b = 0.5
 c = [1/15] * 15
 d = [1/3, 1/3, 1/3, 1/2]
 
+# Target parameters
+TARGET_ADDR = "0.0.0.0"
+TARGET_PORT = 1883
+
 # Configuration variables
 CHOOSE_MUTATION = 0.5
 PACKET_SELECTION_UNIFORM_DISTRIBUTION = 1
@@ -17,3 +21,6 @@ CONSTRUCTION_INTENSITY = 3
 
 # If 1, then the user supplied X1, X2, or X3 in the config file
 user_supplied_X = [0, 0, 0]
+
+# Verbosity
+VERBOSITY = 1
