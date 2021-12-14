@@ -1,4 +1,5 @@
 import globals as g
+import random
 
 class Node():
     def __init__(self, name):
@@ -39,7 +40,12 @@ class Markov_Model():
 
     # Proceed to the next state in the Markov chain
     def next_state(self):
-        return # TODO
+        if self.current_state.name == 'Sf':
+            return 
+            
+        self.current_state = random.choices(
+            self.current_state.next, 
+            weights=self.current_state.next_prob)[0]
 
 def initialize_markov_model():
     mm = Markov_Model()
@@ -73,6 +79,7 @@ def initialize_markov_model():
 
     for ci in g.c:
         mm.state_s1.next_prob.append(ci - (ci * g.X1))
+    mm.state_s1.next_prob.append(g.X1)
 
     # Connect
     mm.state_connect.next = [mm.state_s1]
@@ -143,19 +150,30 @@ def initialize_markov_model():
     ]
     for di in g.d[:3]:
         mm.state_s2.next_prob.append(di - (di * g.X2))
+    mm.state_s2.next_prob.append(g.X2)
 
     # Inject
+    mm.state_inject.next = [mm.state_bof, mm.state_nonbof]
+    mm.state_inject.next_prob = [g.d[3], 1 - g.d[3]]
 
     # Delete
+    mm.state_delete.next = [mm.state_s2]
+    mm.state_delete.next_prob = [1]
 
     # Mutate
+    mm.state_mutate.next = [mm.state_s2]
+    mm.state_mutate.next_prob = [1]
 
     # BOF
+    mm.state_bof.next = [mm.state_s2]
+    mm.state_bof.next_prob = [1]
 
     # Non-BOF
+    mm.state_nonbof.next = [mm.state_s2]
+    mm.state_nonbof.next_prob = [1]
 
     # Send
-
-    # Sf
+    mm.state_send.next = [mm.state_s2, mm.state_sf]
+    mm.state_send.next_prob = [1 - g.X3, g.X3]
 
     return mm
