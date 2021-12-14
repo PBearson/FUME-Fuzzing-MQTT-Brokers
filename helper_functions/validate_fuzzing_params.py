@@ -21,11 +21,13 @@ def validate_packet_selection_uniform_distribution():
 def validate_choose_mutation():
     assert g.CHOOSE_MUTATION <= 1 and g.CHOOSE_MUTATION >= 0
 
-# X1, X2, and X3 must be in the range [0...1]
+# X1, X2, and X3 must be in the range (0...1]
+# They cannot be exactly 0, otherwise bad things happen 
+# (like infinite loops)
 def validate_X():
-    assert g.X1 <= 1 and g.X1 >= 0
-    assert g.X2 <= 1 and g.X2 >= 0
-    assert g.X3 <= 1 and g.X3 >= 0
+    assert g.X1 <= 1 and g.X1 > 0
+    assert g.X2 <= 1 and g.X2 > 0
+    assert g.X3 <= 1 and g.X3 > 0
 
 # b must be in the range [0...1]
 def validate_b():
