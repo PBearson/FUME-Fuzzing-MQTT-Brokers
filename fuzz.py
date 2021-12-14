@@ -9,8 +9,9 @@ import helper_functions.validate_fuzzing_params as vfp
 import helper_functions.parse_config_file as pcf
 import helper_functions.print_configuration as pc
 
-
 import globals as g
+
+import markov_model as mm
 
 def RND(x):
     return round(x)
@@ -65,6 +66,9 @@ def main():
 
     # Print fuzzing configuration
     pc.print_configuration()
+
+    # Initialize Markov Model
+    markov_model = mm.initialize_markov_model()
 
 
 if __name__ == "__main__":
