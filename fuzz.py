@@ -22,6 +22,9 @@ FUZZING_STATE_UNIFORM_DISTRIBUTION = 1
 FUZZING_INTENSITY = 0.1
 CONSTRUCTION_INTENSITY = 3
 
+# If 1, then the user supplied X1, X2, or X3 in the config file
+user_supplied_X = [0, 0, 0]
+
 # CONSTRUCTION_INTENSITY must be a non-negative integer
 def validate_construction_intensity():
     global CONSTRUCTION_INTENSITY
@@ -124,9 +127,9 @@ def parse_config_file(config):
     global CHOOSE_MUTATION
     global PACKET_SELECTION_UNIFORM_DISTRIBUTION
     global FUZZING_STATE_UNIFORM_DISTRIBUTION
-    global b
-    global c
-    global d
+    global FUZZING_INTENSITY, CONSTRUCTION_INTENSITY
+    global b, c, d
+    global X1, X2, X3
 
     for line in config:
         # Only valid key-value pairs
@@ -149,25 +152,65 @@ def parse_config_file(config):
         elif arg[0] == 'FUZZING_STATE_UNIFORM_DISTRIBUTION':
             FUZZING_STATE_UNIFORM_DISTRIBUTION = int(arg[1])
 
+        elif arg[0] == 'FUZZING_INTENSITY':
+            FUZZING_INTENSITY = float(arg[1])
+
+        elif arg[0] == 'CONSTRUCTION_INTENSITY':
+            CONSTRUCTION_INTENSITY = int(arg[1])
+
+        elif arg[0] == 'X1':
+            X1 = float(arg[1])
+            user_supplied_X[0] = 1
+
+        elif arg[0] == 'X2':
+            X2 = float(arg[1])
+            user_supplied_X[1] = 1
+
+        elif arg[0] == 'X3':
+            X3 = float(arg[1])
+            user_supplied_X[2] = 1
+
         elif arg[0] == 'b':
             b = float(arg[1])
-        
+
+        elif arg[0][0] == 'c':
+            # Assertion to make sure we give a proper ci key
+            assert arg[0][1:] in [str(i) for i in range(1, 16)]
+            index = int(arg[0][1:]) - 1
+            c[index] = float(arg[1])
+
+        elif arg[0][0] == 'd':
+            # Assertion to make sure we give a proper di key
+            assert arg[0][1:] in [str(i) for i in range(1, 5)]
+            index = int(arg[0][1:]) - 1
+            d[index] = float(arg[1])
+
+# Print configuration parameters
+def print_configuration():
+    return ## TODO
 
 def main():
-    # Get config file
+
+    # Try to parse the supplied config file.
+    # If one is not supplied, use the default values.
     try:
         config_f = open(sys.argv[1], 'r')
         config = config_f.readlines()
         parse_config_file(config)
         config_f.close()
-    except (FileNotFoundError, IndexError):
+    except FileNotFoundError:
+        print("Could not find the supplied file: %s" % sys.argv[1])
+        exit(-1)
+    except IndexError:
         pass
 
-    validate_all()
-
+    # Calculate X1, X2, and X3
     # calculate_X1()
     # calculate_X2()
     # calculate_X3()    
+
+    validate_all()
+
 
 if __name__ == "__main__":
     main()
