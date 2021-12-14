@@ -13,6 +13,16 @@ import globals as g
 
 import markov_model as mm
 
+# Run the fuzzing engine (indefinitely)
+def run_fuzzing_engine(mm):
+    # TODO select generation or mutation,
+    # then modify the markov model accordingly
+
+    while mm.current_state.name != 'Sf':
+        mm.next_state()
+        if g.VERBOSITY == 2:
+            print("In state %s" % mm.current_state.name)
+
 def RND(x):
     return round(x)
 
@@ -70,6 +80,10 @@ def main():
     # Initialize Markov Model
     markov_model = mm.initialize_markov_model()
 
+    # Run the fuzzing loop
+    run_fuzzing_engine(markov_model)
+
+    
 
 if __name__ == "__main__":
     main()
