@@ -7,6 +7,9 @@ sys.path.append('helper_functions')
 from generators.auth import Auth
 import helper_functions.validate_fuzzing_params as vfp
 import helper_functions.parse_config_file as pcf
+import helper_functions.print_configuration as pc
+
+
 import globals as g
 
 def RND(x):
@@ -15,28 +18,25 @@ def RND(x):
 def RNG(x):
     return random.randint(0, x)
 
-# Calculate X1 from the construction intensity ci
-def calculate_X1(ci = 3):
+# Calculate X1 from the construction intensity
+def calculate_X1():
     num = 1
-    denom = 1 + RNG(RND(ci))
+    denom = 1 + RNG(RND(g.CONSTRUCTION_INTENSITY))
     g.X1 = num / denom
 
-# Calculate X2 from the fuzzing intensity fi
-def calculate_X2(fi = 0.1):
+# Calculate X2 from the fuzzing intensity
+def calculate_X2():
     num = 1
-    denom = 1 + RNG(RND(100 * fi))
+    denom = 1 + RNG(RND(100 * g.FUZZING_INTENSITY))
     g.X2 = num / denom
 
-# Calculate X3 from the fuzzing intensity fi and 
-# construction intensity ci
-def calculate_X3(fi = 0.1, ci = 3):
+# Calculate X3 from the fuzzing intensity and construction intensity
+def calculate_X3():
+    fi = g.FUZZING_INTENSITY
+    ci = g.CONSTRUCTION_INTENSITY
     num = 1
     denom = 1 + RNG(RND(math.log(1 + ci * fi)))
     g.X3 = num / denom
-
-# Print configuration parameters
-def print_configuration():
-    return ## TODO
 
 def main():
     # Try to parse the supplied config file.
@@ -62,6 +62,9 @@ def main():
 
     # Validate all parameters
     vfp.validate_all()
+
+    # Print fuzzing configuration
+    pc.print_configuration()
 
 
 if __name__ == "__main__":
