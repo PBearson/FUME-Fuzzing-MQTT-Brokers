@@ -2,6 +2,8 @@
 
 A successor to [MosquittoByte](https://github.com/PBearson/MosquittoByte).
 
+![FUME Markov Models](images/fuzz_algorithm_both.jpg)
+
 ## Get Started
 
 ## Bugs Discovered with FUME
