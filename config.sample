@@ -87,7 +87,7 @@ b = 0.5
 # X3 = 0.1
 
 ### Determines the percentage of bytes that should be fuzzed
-FUZZING_INTENSITY = 0.1
+FUZZING_INTENSITY = 0.25
 
 ### Determines the maximum number of MQTT packets in a single payload
 CONSTRUCTION_INTENSITY = 3
