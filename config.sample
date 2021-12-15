@@ -98,5 +98,5 @@ TARGET_ADDR = 0.0.0.0
 ### Set the target port
 TARGET_PORT = 1883
 
-### Set the verbosity - 0 (mute), 1 (normal), 2 (verbose)
+### Set the verbosity - 0 (mute), 1 (normal), 2 (verbose), 3 (debug)
 VERBOSITY = 1
