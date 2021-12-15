@@ -3,6 +3,7 @@ import random
 import math
 sys.path.append('generators')
 sys.path.append('helper_functions')
+sys.path.append('fume')
 
 from generators.auth import Auth
 import helper_functions.validate_fuzzing_params as vfp
@@ -11,29 +12,8 @@ import helper_functions.print_configuration as pc
 
 import globals as g
 
-import markov_model as mm
-
-import helper_functions.print_verbosity as pv
-
-# Run the fuzzing engine (indefinitely)
-def run_fuzzing_engine(mm):
-    
-    # Select model type
-    model_types = ['mutation', 'generation']
-    model_type = random.choices(model_types, weights=[g.CHOOSE_MUTATION, 1 - g.CHOOSE_MUTATION])[0]
-    pv.verbose_print("Selected model type %s" % model_type)
-
-    if model_type == 'mutation':
-        mm.state_s0.next = [mm.state_response_log, mm.state_connect]
-        mm.state_s0.next_prob = [g.b, 1 - g.b]
-    else:
-        mm.state_s0.next = [mm.state_connect]
-        mm.state_s0.next_prob = [1]
-
-    pv.verbose_print("In state %s" % mm.current_state.name)
-    while mm.current_state.name != 'Sf':
-        mm.next_state()
-        pv.verbose_print("In state %s" % mm.current_state.name)
+import fume.markov_model as mm
+import fume.fuzzing_engine as fe
 
 def RND(x):
     return round(x)
@@ -93,9 +73,7 @@ def main():
     markov_model = mm.initialize_markov_model()
 
     # Run the fuzzing loop
-    run_fuzzing_engine(markov_model)
-
-    
+    fe.run_fuzzing_engine(markov_model)
 
 if __name__ == "__main__":
     main()
