@@ -53,7 +53,7 @@ def handle_bof_state():
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + p + g.payload[index:] 
 
-    pv.debug_print("Fuzzed payload now: %s" % g.payload)
+    pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, g.payload))
 
 # Inject some bytes into the payload
 def handle_nonbof_state():
@@ -68,7 +68,7 @@ def handle_nonbof_state():
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + p + g.payload[index:] 
 
-    pv.debug_print("Fuzzed payload now: %s" % g.payload)
+    pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, g.payload))
 
 # Remove some bytes from the payload
 def handle_delete_state():
@@ -82,7 +82,19 @@ def handle_delete_state():
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + g.payload[index + 1:]
 
-    pv.debug_print("Fuzzed payload now: %s" % g.payload)
+    pv.debug_print("Fuzzed payload now (deleted %d bytes): %s" % (delete_len, g.payload))
+
+# Mutate some bytes in the payload
+def handle_mutate_state():
+    maxlen = len(g.payload) * g.FUZZING_INTENSITY
+    mutate_len = random.randint(1, round(maxlen))
+    mutate_payload = str(random.getrandbits(mutate_len * 8))
+
+    for p in mutate_payload:
+        index = random.randint(0, len(g.payload))
+        g.payload = g.payload[:index] + p + g.payload[index + 1:] 
+
+    pv.debug_print("Fuzzed payload now (mutated %d bytes): %s" % (mutate_len, g.payload))
 
 # Either select (from the corpus) or generate a new packet
 # and append it the payload
@@ -188,8 +200,13 @@ def handle_state(mm):
     elif state == 'NONBOF':
         handle_nonbof_state()
 
+    # In state DELETE, we delete a few bytes from the payload
     elif state == 'DELETE':
         handle_delete_state()
+
+    # In state MUTATE, we mutate a few bytes in the payload
+    elif state == 'MUTATE':
+        handle_mutate_state()
 
 
 # Run the fuzzing engine (indefinitely)
