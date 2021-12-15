@@ -41,15 +41,34 @@ def handle_s2_state(mm):
 # Default behavior is to inject between 1 and 10 times the length
 # of the payload, up to a defined maximum payload length 
 def handle_bof_state(mm):
-    if(len(g.payload) >= 10000):
+    if len(g.payload) >= 10000:
         return
+
     minlen = (1 + g.FUZZING_INTENSITY) * len(g.payload)
     maxlen = 5 * (1 + g.FUZZING_INTENSITY) * len(g.payload)
     inject_len = random.randint(round(minlen), round(maxlen))
     inject_payload = str(random.getrandbits(inject_len * 8))
-    g.payload += inject_payload
+    
+    for p in inject_payload:
+        index = random.randint(0, len(g.payload))
+        g.payload = g.payload[:index] + p + g.payload[index:] 
+
     pv.debug_print("Fuzzed payload now: %s" % g.payload)
 
+# Inject some bytes into the payload
+def handle_nonbof_state(mm):
+    if len(g.payload) >= 10000:
+        return
+
+    maxlen = len(g.payload) * g.FUZZING_INTENSITY
+    inject_len = random.randint(1, round(maxlen))
+    inject_payload = str(random.getrandbits(inject_len * 8))
+
+    for p in inject_payload:
+        index = random.randint(0, len(g.payload))
+        g.payload = g.payload[:index] + p + g.payload[index:] 
+
+    pv.debug_print("Fuzzed payload now: %s" % g.payload)    
 
 # Either select (from the corpus) or generate a new packet
 # and append it the payload
@@ -151,6 +170,10 @@ def handle_state(mm):
     elif state == 'BOF':
         handle_bof_state(mm)
 
+    # In state BOF, we inject a few bytes into the payload
+    elif state == 'NONBOF':
+        handle_nonbof_state(mm)
+
 
 # Run the fuzzing engine (indefinitely)
 # mm: the markov model
@@ -168,7 +191,9 @@ def run_fuzzing_engine(mm):
         mm.state_s0.next = [mm.state_connect]
         mm.state_s0.next_prob = [1]
 
-    while mm.current_state.name != 'Sf':
-        pv.verbose_print("In state %s" % mm.current_state.name)
-        handle_state(mm)
-        mm.next_state()
+    while True:
+        mm.current_state = mm.state_s0
+        while mm.current_state.name != 'Sf':
+            pv.verbose_print("In state %s" % mm.current_state.name)
+            handle_state(mm)
+            mm.next_state()
