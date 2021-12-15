@@ -24,3 +24,6 @@ user_supplied_X = [0, 0, 0]
 
 # Verbosity
 VERBOSITY = 1
+
+# Payload
+payload = ''
