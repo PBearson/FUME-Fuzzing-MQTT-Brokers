@@ -26,6 +26,35 @@ def corpus_to_array(file):
         lines[index] = line.replace("\n", "")
     return lines
 
+# In state S2, convert the payload to a string (unless we have 
+# already done so)
+def handle_s2_state(mm):
+    if type(g.payload) is str:
+        return
+
+    if mm.model_type == 'mutation':
+        g.payload = "".join(g.payload)
+    else:
+        g.payload = "".join([p.toString() for p in g.payload])
+
+# Inject many bytes into the payload
+# Default behavior is to inject between 1 and 10 times the length
+# of the payload, up to a defined maximum payload length 
+def handle_bof_state(mm):
+    if(len(g.payload) >= 10000):
+        return
+    minlen = (1 + g.FUZZING_INTENSITY) * len(g.payload)
+    maxlen = 5 * (1 + g.FUZZING_INTENSITY) * len(g.payload)
+    inject_len = random.randint(round(minlen), round(maxlen))
+    inject_payload = str(random.getrandbits(inject_len * 8))
+    g.payload += inject_payload
+    pv.debug_print("Fuzzed payload now: %s" % g.payload)
+
+
+# Either select (from the corpus) or generate a new packet
+# and append it the payload
+# mm: the markov model
+# packet: a Packet class 
 def handle_select_or_generation_state(mm, packet):
     state_name = mm.current_state.name
 
@@ -37,7 +66,11 @@ def handle_select_or_generation_state(mm, packet):
         pv.debug_print("Added payload %s" % payload)
         pv.debug_print("Payload so far: %s" % "".join(g.payload))
     else:
-        payload = packet()
+        if len(g.payload) == 0:
+            payload = packet()
+        else:
+            protocol_version = g.payload[0].protocol_version
+            payload = packet(protocol_version)
         g.payload.append(payload)
         pv.debug_print("Added payload %s" % payload.toString())
         pv.debug_print("Payload so far: %s" % "".join([p.toString() for p in g.payload]))
@@ -107,6 +140,16 @@ def handle_state(mm):
     elif state == 'AUTH':
         handle_select_or_generation_state(mm, Auth)
 
+    elif state == 'S2':
+        handle_s2_state(mm)
+
+    # In states S1, INJECT, and Sf, we just proceed to the next state
+    elif state in ['S1', 'INJECT', 'Sf']:
+        return
+
+    # In state BOF, we inject many, many bytes into the payload
+    elif state == 'BOF':
+        handle_bof_state(mm)
 
 
 # Run the fuzzing engine (indefinitely)
