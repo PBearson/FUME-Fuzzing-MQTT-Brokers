@@ -15,31 +15,17 @@ import globals as g
 import fume.markov_model as mm
 import fume.fuzzing_engine as fe
 
-def RND(x):
-    return round(x)
-
-def RNG(x):
-    return random.randint(0, x)
-
 # Calculate X1 from the construction intensity
 def calculate_X1():
-    num = 1
-    denom = 1 + RNG(RND(g.CONSTRUCTION_INTENSITY))
-    g.X1 = num / denom
+    g.X1 = 1 / g.CONSTRUCTION_INTENSITY
 
 # Calculate X2 from the fuzzing intensity
 def calculate_X2():
-    num = 1
-    denom = 1 + RNG(RND(100 * g.FUZZING_INTENSITY))
-    g.X2 = num / denom
+    g.X2 = 1 - g.FUZZING_INTENSITY
 
-# Calculate X3 from the fuzzing intensity and construction intensity
+# Calculate X3 from the fuzzing intensity
 def calculate_X3():
-    fi = g.FUZZING_INTENSITY
-    ci = g.CONSTRUCTION_INTENSITY
-    num = 1
-    denom = 1 + RNG(RND(math.log(1 + ci * fi)))
-    g.X3 = num / denom
+    g.X3 = 1 - (2 * math.log(1 + g.FUZZING_INTENSITY, 10))
 
 def main():
     # Try to parse the supplied config file.
