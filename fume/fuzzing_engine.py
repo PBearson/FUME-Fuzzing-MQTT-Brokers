@@ -40,7 +40,7 @@ def handle_s2_state(mm):
 # Inject many bytes into the payload
 # Default behavior is to inject between 1 and 10 times the length
 # of the payload, up to a defined maximum payload length 
-def handle_bof_state(mm):
+def handle_bof_state():
     if len(g.payload) >= 10000:
         return
 
@@ -56,7 +56,7 @@ def handle_bof_state(mm):
     pv.debug_print("Fuzzed payload now: %s" % g.payload)
 
 # Inject some bytes into the payload
-def handle_nonbof_state(mm):
+def handle_nonbof_state():
     if len(g.payload) >= 10000:
         return
 
@@ -68,7 +68,21 @@ def handle_nonbof_state(mm):
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + p + g.payload[index:] 
 
-    pv.debug_print("Fuzzed payload now: %s" % g.payload)    
+    pv.debug_print("Fuzzed payload now: %s" % g.payload)
+
+# Remove some bytes from the payload
+def handle_delete_state():
+    if len(g.payload) <= 2:
+        return
+
+    maxlen = len(g.payload) * g.FUZZING_INTENSITY
+    delete_len = random.randint(1, round(maxlen))
+
+    for d in range(delete_len):
+        index = random.randint(0, len(g.payload))
+        g.payload = g.payload[:index] + g.payload[index + 1:]
+
+    pv.debug_print("Fuzzed payload now: %s" % g.payload)
 
 # Either select (from the corpus) or generate a new packet
 # and append it the payload
@@ -168,11 +182,14 @@ def handle_state(mm):
 
     # In state BOF, we inject many, many bytes into the payload
     elif state == 'BOF':
-        handle_bof_state(mm)
+        handle_bof_state()
 
     # In state BOF, we inject a few bytes into the payload
     elif state == 'NONBOF':
-        handle_nonbof_state(mm)
+        handle_nonbof_state()
+
+    elif state == 'DELETE':
+        handle_delete_state()
 
 
 # Run the fuzzing engine (indefinitely)
@@ -197,3 +214,4 @@ def run_fuzzing_engine(mm):
             pv.verbose_print("In state %s" % mm.current_state.name)
             handle_state(mm)
             mm.next_state()
+        break
