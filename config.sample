@@ -75,7 +75,7 @@ b = 0.5
 # d3 = 1/3
 
 ### Probability of selecting the BOF fuzzing state
-# d4 = 1/3
+# d4 = 1/8
 
 ### Probability of transitioning from state S1 to state S2
 # X1 = 0.1
