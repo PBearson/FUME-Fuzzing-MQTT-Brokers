@@ -38,6 +38,8 @@ class Markov_Model():
 
         self.current_state = self.state_s0
 
+        self.model_type = 'mutation'
+
     # Proceed to the next state in the Markov chain
     def next_state(self):
         if self.current_state.name == 'Sf':
