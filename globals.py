@@ -25,5 +25,10 @@ user_supplied_X = [0, 0, 0]
 # Verbosity
 VERBOSITY = 1
 
-# Payload
-payload = ''
+# Payload -- a list of either Packet objects or strings 
+# (depending on the model type)
+payload = []
+
+# Network response log - a dictionary where the key is a 
+# request and the value is the response
+network_response_log = {}
