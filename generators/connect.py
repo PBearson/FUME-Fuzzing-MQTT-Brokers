@@ -78,6 +78,8 @@ class Connect(Packet):
         if protocol_version is None:
             protocol_version = random.randint(3, 5)
 
+        self.protocol_version = protocol_version
+
         self.fixed_header = ["%.2x" % 0b10000]
         self.variable_header = ConnectVariableHeader(protocol_version)
         self.connect_payload = ConnectPayload(self.variable_header)
