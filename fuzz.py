@@ -4,6 +4,7 @@ import math
 sys.path.append('generators')
 sys.path.append('helper_functions')
 sys.path.append('fume')
+sys.path.append('parsers')
 
 from generators.auth import Auth
 import helper_functions.validate_fuzzing_params as vfp
