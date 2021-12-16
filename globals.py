@@ -29,6 +29,9 @@ VERBOSITY = 1
 # (depending on the model type)
 payload = []
 
+# The protocol version of the current payload
+protocol_version = 0
+
 # Network response log - a dictionary where the key is a 
 # request and the value is the response
 network_response_log = {}
