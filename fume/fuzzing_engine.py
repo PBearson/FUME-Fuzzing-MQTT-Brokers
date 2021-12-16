@@ -14,7 +14,10 @@ from generators.pingresp import Pingresp
 from generators.disconnect import Disconnect
 from generators.auth import Auth
 
+import handle_network_response as hnr
+
 import helper_functions.print_verbosity as pv
+import helper_functions.determine_protocol_version as dpv
 import globals as g
 
 import random
@@ -46,6 +49,7 @@ def handle_send_state():
         exit(-1)
 
     # Get the response from the target
+    recv = b''
     try:
         recv = s.recv(1024)
         pv.normal_print("Response: %s" % binascii.hexlify(recv))
@@ -55,7 +59,10 @@ def handle_send_state():
         pv.debug_print("Connection closed after sending the payload")
     s.close()
 
+
     # TODO store recv in network response log
+    hnr.handle_network_response(recv)
+
 
 # In state S2, convert the payload to a byte string (unless we have 
 # already done so)
@@ -145,9 +152,9 @@ def handle_select_or_generation_state(mm, packet):
     else:
         if len(g.payload) == 0:
             payload = packet()
+            g.protocol_version = payload.protocol_version
         else:
-            protocol_version = g.payload[0].protocol_version
-            payload = packet(protocol_version)
+            payload = packet(g.protocol_version)
         g.payload.append(payload)
         pv.debug_print("Added payload %s" % payload.toString())
         pv.debug_print("Payload so far: %s" % "".join([p.toString() for p in g.payload]))
@@ -164,7 +171,8 @@ def handle_state(mm):
     # the state to CONNECT
     elif state == 'RESPONSE_LOG':
         if len(g.network_response_log) > 0:
-            g.payload += random.choice(g.network_response_log)
+            response = random.choice(list(g.network_response_log.keys()))
+            g.payload = g.network_response_log[response]
         else:
             mm.current_state = mm.state_connect
             handle_state(mm)
@@ -264,8 +272,13 @@ def run_fuzzing_engine(mm):
 
         # Set the current state to S0
         mm.current_state = mm.state_s0
+
+        # Set protocol version to 0 so that we are forced
+        # to determine it
+        g.protocol_version = 0
+
+        # Run until we hit the final state
         while mm.current_state.name != 'Sf':
             pv.verbose_print("In state %s" % mm.current_state.name)
             handle_state(mm)
             mm.next_state()
-        # break
