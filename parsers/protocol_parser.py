@@ -21,11 +21,13 @@ class ProtocolParser:
                 self.G_fields[fieldName] = [value]
             elif value not in self.G_fields[fieldName]:
                 self.G_fields[fieldName].append(value)
+                self.G_fields[fieldName].sort()
         else:
             if fieldName not in self.H_fields.keys():
                 self.H_fields[fieldName] = [value]
             elif value not in self.H_fields[fieldName]:
                 self.H_fields[fieldName].append(value)
+                self.H_fields[fieldName].sort()
         return index + 4
 
 
