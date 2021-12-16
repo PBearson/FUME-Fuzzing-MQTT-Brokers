@@ -52,7 +52,7 @@ def handle_send_state():
     recv = b''
     try:
         recv = s.recv(1024)
-        pv.normal_print("Response: %s" % binascii.hexlify(recv))
+        pv.verbose_print("Response: %s" % binascii.hexlify(recv))
     except socket.timeout:
         pv.debug_print("Timeout while waiting for response")
     except ConnectionResetError:
@@ -173,6 +173,7 @@ def handle_state(mm):
         if len(g.network_response_log) > 0:
             response = random.choice(list(g.network_response_log.keys()))
             g.payload = g.network_response_log[response]
+
         else:
             mm.current_state = mm.state_connect
             handle_state(mm)
