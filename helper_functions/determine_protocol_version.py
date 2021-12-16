@@ -10,7 +10,7 @@ def determine_protocol_version(packet):
             index = 0
             while index < len(packet):
                 parser = ParseInitializer(packet[index:], version)
-                index += parser.parser.index
+                index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
             return version
         except KeyError:
             continue

@@ -20,4 +20,4 @@ def handle_network_response(recv):
         
         print(parser.parser.G_fields)
         print(parser.parser.H_fields)
-        index += parser.parser.index
+        index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
