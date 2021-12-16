@@ -32,13 +32,28 @@ def corpus_to_array(file):
 # Send the payload to the target and wait for a response
 def handle_send_state():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.settimeout(0.05)
+
+    # Connect to the target and send the payload
     try:
+        pv.verbose_print("Sending payload to the target: %s" % binascii.hexlify(g.payload))
         s.connect((g.TARGET_ADDR, g.TARGET_PORT))
         s.send(g.payload)
-        s.close()
     except ConnectionRefusedError:
         pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
         exit(-1)
+
+    # Get the response from the target
+    try:
+        recv = s.recv(1024)
+        pv.normal_print("Response: %s" % binascii.hexlify(recv))
+    except socket.timeout:
+        pv.debug_print("Timeout while waiting for response")
+    except ConnectionResetError:
+        pv.debug_print("Connection closed after sending the payload")
+    s.close()
+
+    # TODO store recv in network response log
 
 # In state S2, convert the payload to a byte string (unless we have 
 # already done so)
@@ -68,7 +83,7 @@ def handle_bof_state():
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + p.to_bytes(1, 'little') + g.payload[index:] 
 
-    pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, g.payload))
+    pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, binascii.hexlify(g.payload)))
 
 # Inject some bytes into the payload
 def handle_nonbof_state():
@@ -83,7 +98,7 @@ def handle_nonbof_state():
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + p.to_bytes(1, 'little') + g.payload[index:] 
 
-    pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, g.payload))
+    pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, binascii.hexlify(g.payload)))
 
 # Remove some bytes from the payload
 def handle_delete_state():
@@ -97,7 +112,7 @@ def handle_delete_state():
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + g.payload[index + 1:]
 
-    pv.debug_print("Fuzzed payload now (deleted %d bytes): %s" % (delete_len, g.payload))
+    pv.debug_print("Fuzzed payload now (deleted %d bytes): %s" % (delete_len, binascii.hexlify(g.payload)))
 
 # Mutate some bytes in the payload
 def handle_mutate_state():
@@ -109,7 +124,7 @@ def handle_mutate_state():
         index = random.randint(0, len(g.payload))
         g.payload = g.payload[:index] + p.to_bytes(1, 'little') + g.payload[index + 1:] 
 
-    pv.debug_print("Fuzzed payload now (mutated %d bytes): %s" % (mutate_len, g.payload))
+    pv.debug_print("Fuzzed payload now (mutated %d bytes): %s" % (mutate_len, binascii.hexlify(g.payload)))
 
 # Either select (from the corpus) or generate a new packet
 # and append it the payload
@@ -231,20 +246,21 @@ def handle_state(mm):
 # Run the fuzzing engine (indefinitely)
 # mm: the markov model
 def run_fuzzing_engine(mm):
-    
-    # Select model type
-    model_types = ['mutation', 'generation']
-    mm.model_type = random.choices(model_types, weights=[g.CHOOSE_MUTATION, 1 - g.CHOOSE_MUTATION])[0]
-    pv.verbose_print("Selected model type %s" % mm.model_type)
-
-    if mm.model_type == 'mutation':
-        mm.state_s0.next = [mm.state_response_log, mm.state_connect]
-        mm.state_s0.next_prob = [g.b, 1 - g.b]
-    else:
-        mm.state_s0.next = [mm.state_connect]
-        mm.state_s0.next_prob = [1]
 
     while True:
+        # Select model type
+        model_types = ['mutation', 'generation']
+        mm.model_type = random.choices(model_types, weights=[g.CHOOSE_MUTATION, 1 - g.CHOOSE_MUTATION])[0]
+        pv.verbose_print("Selected model type %s" % mm.model_type)
+
+        if mm.model_type == 'mutation':
+            mm.state_s0.next = [mm.state_response_log, mm.state_connect]
+            mm.state_s0.next_prob = [g.b, 1 - g.b]
+        else:
+            mm.state_s0.next = [mm.state_connect]
+            mm.state_s0.next_prob = [1]
+
+        # Set the current state to S0
         mm.current_state = mm.state_s0
         while mm.current_state.name != 'Sf':
             pv.verbose_print("In state %s" % mm.current_state.name)
