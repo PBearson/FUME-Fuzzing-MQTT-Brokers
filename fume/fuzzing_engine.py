@@ -59,8 +59,7 @@ def handle_send_state():
         pv.debug_print("Connection closed after sending the payload")
     s.close()
 
-
-    # TODO store recv in network response log
+    # Store recv in network response log
     hnr.handle_network_response(recv)
 
 
@@ -159,6 +158,15 @@ def handle_select_or_generation_state(mm, packet):
         pv.debug_print("Added payload %s" % payload.toString())
         pv.debug_print("Payload so far: %s" % "".join([p.toString() for p in g.payload]))
     
+def handle_response_log_state(mm):
+    if len(g.network_response_log) > 0:
+        response = random.choice(list(g.network_response_log.keys()))
+        g.payload = g.network_response_log[response]
+
+    else:
+        mm.current_state = mm.state_connect
+        handle_state(mm)
+
 # Handle the next state in the model
 def handle_state(mm):
     state = mm.current_state.name
@@ -170,13 +178,7 @@ def handle_state(mm):
     # In state RESPONSE_LOG, we select a payload from the previous responses. If the previous responses are empty, we just set 
     # the state to CONNECT
     elif state == 'RESPONSE_LOG':
-        if len(g.network_response_log) > 0:
-            response = random.choice(list(g.network_response_log.keys()))
-            g.payload = g.network_response_log[response]
-
-        else:
-            mm.current_state = mm.state_connect
-            handle_state(mm)
+        handle_response_log_state(mm)
 
     # For the packet-specific states, we either connect or generate
     # the desired packet and append it to the payload
