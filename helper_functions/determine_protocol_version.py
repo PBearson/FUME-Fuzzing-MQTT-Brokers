@@ -9,8 +9,15 @@ def determine_protocol_version(packet):
         try:
             index = 0
             while index < len(packet):
-                parser = ParseInitializer(packet[index:], version)
-                index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
+                try:
+                    parser = ParseInitializer(packet[index:], version)
+                    index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
+
+                # If the parser throws a ValueError, chances are that the payload
+                # is malformed. In that case, we skip the current byte and hope for 
+                # the best.
+                except ValueError:
+                    index += 2
             return version
         except KeyError:
             continue

@@ -15,12 +15,19 @@ def handle_network_response(recv):
         
     index = 0
     while index < len(recv.hex()):
-        parser = ParseInitializer(recv.hex()[index:], g.protocol_version)
+        try:
+            parser = ParseInitializer(recv.hex()[index:], g.protocol_version)
 
-        # Log G fields
-        G_fields = str(parser.parser.G_fields)
-        if G_fields not in g.network_response_log.keys():
-            g.network_response_log[G_fields] = g.payload
-            pv.normal_print("Found new response (%d found)" % len(g.network_response_log.keys()))
+            # Log G fields
+            G_fields = str(parser.parser.G_fields)
+            if G_fields not in g.network_response_log.keys():
+                g.network_response_log[G_fields] = g.payload
+                pv.normal_print("Found new response (%d found)" % len(g.network_response_log.keys()))
 
-        index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
+            index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
+
+        # If the parser throws a ValueError, chances are that the payload
+        # is malformed. In that case, we skip the current byte and hope for 
+        # the best.
+        except ValueError:
+            index += 2

@@ -41,10 +41,17 @@ class ParseInitializer:
             self.parser = None
 
 if __name__ == "__main__":
-    payload = "200900000622000a21001470020001b00400020011"
+    payload = "312d0023245359532f62726f6b65722f6c6f61642f7075626c6973682f73656e742f31356d696e31363233372e373831"
     index = 0
     while index < len(payload):
-        parser = ParseInitializer(payload[index:], 5)
-        print(parser.parser.G_fields)
-        print(parser.parser.H_fields)
-        index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
+        try:
+            parser = ParseInitializer(payload[index:], 3)        
+            print(parser.parser.G_fields)
+            print(parser.parser.H_fields)
+            index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
+
+        # If the parser throws a ValueError, chances are that the payload
+        # is malformed. In that case, we skip the current byte and hope for 
+        # the best.
+        except ValueError:
+            index += 2
