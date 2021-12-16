@@ -16,9 +16,11 @@ class PubrelParser(Parser):
         self.index = self.insertTwoBytesNoIdentifier("packet identifier", payload, self.index, False)
 
         if protocol_version == 5:
-            self.index = self.insertByteNoIdentifier("reason code", payload, self.index, True)
+            if self.remainingLengthToInteger() >= 4:
+                self.index = self.insertByteNoIdentifier("reason code", payload, self.index, True)
 
             self.parseProperties()
+            
 
 def test():
     protocol_version = random.randint(3, 5)

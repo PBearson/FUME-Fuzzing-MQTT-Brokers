@@ -89,6 +89,16 @@ class ProtocolParser:
     def insertVariableByteIntegerNoIdentifier(self, fieldName, payload, index, use_G_field):
         return self.insertVariableByteInteger(fieldName, payload, index - 2, use_G_field)
 
+    # Simply conver the remaining length field into an integer
+    def remainingLengthToInteger(self):
+        multiplier = 1
+        sum = 0
+        for i in range(0, len(self.remaining_length), 2):
+            sum += int(self.remaining_length[i:i+2], 16) * multiplier
+            multiplier *= 128
+        print("Remaining length of this packet: %d" % sum)
+        return sum
+
     def insertVariableByteInteger(self, fieldName, payload, index, use_G_field):
         index += 2
         startIndex = index
@@ -218,6 +228,7 @@ class ProtocolParser:
                 break
 
         properties = self.indexToByte(self.index, propertyLength)
+        print("Properties: %s" % properties)
         self.parsePropertiesHelper(properties)
         self.index += propertyLength * 2
 
@@ -242,10 +253,10 @@ class ProtocolParser:
         fixed_header = self.indexToByte()
         self.G_fields["fixed header"] = fixed_header
 
-        # Skip over remaining length field
+        # Get the length
         self.index = 2
+        self.remaining_length = payload[self.index:self.index+2]
         while int(self.indexToByte(), 16) > 127:
             self.index += 2
+            self.remaining_length += payload[self.index:self.index+2]
         self.index += 2
-
-        

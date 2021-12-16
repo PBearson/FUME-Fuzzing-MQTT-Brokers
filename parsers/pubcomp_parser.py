@@ -17,8 +17,9 @@ class PubcompParser(Parser):
 
         if protocol_version == 5:
             self.index = self.insertByteNoIdentifier("reason code", payload, self.index, True)
-
-            self.parseProperties()
+            
+            if self.remainingLengthToInteger() >= 4:
+                self.parseProperties()
 
 def test():
     protocol_version = random.randint(3, 5)
