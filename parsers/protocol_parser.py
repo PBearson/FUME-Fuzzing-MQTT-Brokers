@@ -96,7 +96,6 @@ class ProtocolParser:
         for i in range(0, len(self.remaining_length), 2):
             sum += int(self.remaining_length[i:i+2], 16) * multiplier
             multiplier *= 128
-        print("Remaining length of this packet: %d" % sum)
         return sum
 
     def insertVariableByteInteger(self, fieldName, payload, index, use_G_field):
@@ -228,7 +227,6 @@ class ProtocolParser:
                 break
 
         properties = self.indexToByte(self.index, propertyLength)
-        print("Properties: %s" % properties)
         self.parsePropertiesHelper(properties)
         self.index += propertyLength * 2
 

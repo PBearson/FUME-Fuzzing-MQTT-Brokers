@@ -37,7 +37,6 @@ class ParseInitializer:
 
         if len(payload) > 0:
             self.parser = packetDict[payload[0]](payload, protocol_version)
-            print("Chose parser %s" % packetDict[payload[0]])
         else:
             self.parser = None
 
@@ -45,7 +44,6 @@ if __name__ == "__main__":
     payload = "200900000622000a21001470020001b00400020011"
     index = 0
     while index < len(payload):
-        print("Remaining payload: %s" % payload[index:])
         parser = ParseInitializer(payload[index:], 5)
         print(parser.parser.G_fields)
         print(parser.parser.H_fields)
