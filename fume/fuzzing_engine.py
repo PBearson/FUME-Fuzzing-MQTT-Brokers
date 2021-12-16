@@ -16,7 +16,10 @@ from generators.auth import Auth
 
 import helper_functions.print_verbosity as pv
 import globals as g
+
 import random
+import binascii
+import socket
 
 # Convert a corpus (file) into a list of strings. Each element is 
 # an MQTT packet.
@@ -26,16 +29,28 @@ def corpus_to_array(file):
         lines[index] = line.replace("\n", "")
     return lines
 
-# In state S2, convert the payload to a string (unless we have 
+# Send the payload to the target and wait for a response
+def handle_send_state():
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.connect((g.TARGET_ADDR, g.TARGET_PORT))
+        s.send(g.payload)
+        s.close()
+    except ConnectionRefusedError:
+        pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
+        exit(-1)
+
+# In state S2, convert the payload to a byte string (unless we have 
 # already done so)
 def handle_s2_state(mm):
-    if type(g.payload) is str:
+    if type(g.payload) is bytearray:
         return
 
     if mm.model_type == 'mutation':
         g.payload = "".join(g.payload)
     else:
         g.payload = "".join([p.toString() for p in g.payload])
+    g.payload = bytearray.fromhex(g.payload)
 
 # Inject many bytes into the payload
 # Default behavior is to inject between 1 and 10 times the length
@@ -47,11 +62,11 @@ def handle_bof_state():
     minlen = (1 + g.FUZZING_INTENSITY) * len(g.payload)
     maxlen = 5 * (1 + g.FUZZING_INTENSITY) * len(g.payload)
     inject_len = random.randint(round(minlen), round(maxlen))
-    inject_payload = str(random.getrandbits(inject_len * 8))
+    inject_payload = random.getrandbits(8 * inject_len).to_bytes(inject_len, 'little')
     
     for p in inject_payload:
         index = random.randint(0, len(g.payload))
-        g.payload = g.payload[:index] + p + g.payload[index:] 
+        g.payload = g.payload[:index] + p.to_bytes(1, 'little') + g.payload[index:] 
 
     pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, g.payload))
 
@@ -62,11 +77,11 @@ def handle_nonbof_state():
 
     maxlen = len(g.payload) * g.FUZZING_INTENSITY
     inject_len = random.randint(1, round(maxlen))
-    inject_payload = str(random.getrandbits(inject_len * 8))
+    inject_payload = random.getrandbits(8 * inject_len).to_bytes(inject_len, 'little')
 
     for p in inject_payload:
         index = random.randint(0, len(g.payload))
-        g.payload = g.payload[:index] + p + g.payload[index:] 
+        g.payload = g.payload[:index] + p.to_bytes(1, 'little') + g.payload[index:] 
 
     pv.debug_print("Fuzzed payload now (injected %d bytes): %s" % (inject_len, g.payload))
 
@@ -88,11 +103,11 @@ def handle_delete_state():
 def handle_mutate_state():
     maxlen = len(g.payload) * g.FUZZING_INTENSITY
     mutate_len = random.randint(1, round(maxlen))
-    mutate_payload = str(random.getrandbits(mutate_len * 8))
+    mutate_payload = random.getrandbits(8 * mutate_len).to_bytes(mutate_len, 'little')
 
     for p in mutate_payload:
         index = random.randint(0, len(g.payload))
-        g.payload = g.payload[:index] + p + g.payload[index + 1:] 
+        g.payload = g.payload[:index] + p.to_bytes(1, 'little') + g.payload[index + 1:] 
 
     pv.debug_print("Fuzzed payload now (mutated %d bytes): %s" % (mutate_len, g.payload))
 
@@ -208,6 +223,10 @@ def handle_state(mm):
     elif state == 'MUTATE':
         handle_mutate_state()
 
+    # in state SEND, we send the payload to the target
+    elif state == 'SEND':
+        handle_send_state()
+
 
 # Run the fuzzing engine (indefinitely)
 # mm: the markov model
@@ -231,4 +250,4 @@ def run_fuzzing_engine(mm):
             pv.verbose_print("In state %s" % mm.current_state.name)
             handle_state(mm)
             mm.next_state()
-        break
+        # break
