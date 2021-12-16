@@ -39,6 +39,8 @@ def handle_send_state():
         pv.verbose_print("Sending payload to the target: %s" % binascii.hexlify(g.payload))
         s.connect((g.TARGET_ADDR, g.TARGET_PORT))
         s.send(g.payload)
+        # TODO after we send the payload, we can log it in a limited-sized queue.
+        # When the broker crashes, we print the traceback of the queue
     except ConnectionRefusedError:
         pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
         exit(-1)
