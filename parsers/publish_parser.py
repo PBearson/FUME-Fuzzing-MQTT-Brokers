@@ -26,8 +26,9 @@ class PublishParser(Parser):
 
         if protocol_version == 5:
             self.parseProperties()
-
-        self.H_fields["message"] = payload[self.index:]
+            
+        message_length = (self.remainingLengthToInteger() * 2) + 2 + len(self.remaining_length) - self.index
+        self.H_fields["message"] = payload[self.index:self.index+message_length]
 
 
 def test():
