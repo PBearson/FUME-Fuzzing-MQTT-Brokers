@@ -36,6 +36,11 @@ payload = []
 # The protocol version of the current payload
 protocol_version = 0
 
-# Network response log - a dictionary where the key is a 
-# request and the value is the response
+# Response logs - each is a dictionary where the 
+# key is a request and the value is the response
 network_response_log = {}
+console_response_log = {}
+
+# Request queue parameters
+request_queue = []
+REQUEST_QUEUE_SIZE = 5

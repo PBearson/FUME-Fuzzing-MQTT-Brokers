@@ -15,6 +15,7 @@ from generators.disconnect import Disconnect
 from generators.auth import Auth
 
 import handle_network_response as hnr
+import requests_queue as rq
 
 import helper_functions.print_verbosity as pv
 import helper_functions.determine_protocol_version as dpv
@@ -44,8 +45,10 @@ def handle_send_state():
         s.send(g.payload)
         # TODO after we send the payload, we can log it in a limited-sized queue.
         # When the broker crashes, we print the traceback of the queue
+        rq.push(g.payload)
     except ConnectionRefusedError:
         pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
+        rq.print_queue()
         exit(-1)
 
     # Get the response from the target
@@ -259,8 +262,11 @@ def handle_state(mm):
 # Run the fuzzing engine (indefinitely)
 # mm: the markov model
 def run_fuzzing_engine(mm):
+    # file = open("benchmark.txt", "w")
+    # file.close()
 
     while True:
+    # for i in range(10000):
         # Select model type
         model_types = ['mutation', 'generation']
         mm.model_type = random.choices(model_types, weights=[g.CHOOSE_MUTATION, 1 - g.CHOOSE_MUTATION])[0]
@@ -285,3 +291,6 @@ def run_fuzzing_engine(mm):
             pv.verbose_print("In state %s" % mm.current_state.name)
             handle_state(mm)
             mm.next_state()
+        # file = open("benchmark.txt", "a")
+        # file.write("%d\n" % len(g.network_response_log.keys()))
+        # file.close()
