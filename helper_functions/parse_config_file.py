@@ -64,3 +64,9 @@ def parse_config_file(config):
 
         elif arg[0] == 'VERBOSITY':
             g.VERBOSITY = int(arg[1])
+
+        elif arg[0] == 'START_COMMAND':
+            g.START_COMMAND = arg[1]
+
+        elif arg[0] == "TARGET_START_TIME":
+            g.TARGET_START_TIME = float(arg[1])

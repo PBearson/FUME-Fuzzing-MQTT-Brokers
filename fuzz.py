@@ -15,6 +15,7 @@ import globals as g
 
 import fume.markov_model as mm
 import fume.fuzzing_engine as fe
+import fume.run_target as rt
 
 # Calculate X1 from the construction intensity
 def calculate_X1():
@@ -58,6 +59,9 @@ def main():
 
     # Initialize Markov Model
     markov_model = mm.initialize_markov_model()
+
+    # Start the target
+    rt.run_target()
 
     # Run the fuzzing loop
     fe.run_fuzzing_engine(markov_model)

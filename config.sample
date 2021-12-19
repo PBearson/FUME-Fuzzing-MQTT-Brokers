@@ -100,3 +100,10 @@ TARGET_PORT = 1883
 
 ### Set the verbosity - 0 (mute), 1 (normal), 2 (verbose), 3 (debug)
 VERBOSITY = 1
+
+### Provide the command to start the target.
+### This argument MUST be given if you want to monitor console responses or automatically restart the target.
+# START_COMMAND = /home/user1/mosquitto/src/mosquitto
+
+### The number of seconds it takes to start the target
+# TARGET_START_TIME = 0.5
