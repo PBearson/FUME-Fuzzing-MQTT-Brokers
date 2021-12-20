@@ -21,6 +21,19 @@ def validate_packet_selection_uniform_distribution():
 def validate_choose_mutation():
     assert g.CHOOSE_MUTATION <= 1 and g.CHOOSE_MUTATION >= 0
 
+# TARGET_START_TIME cannot be negative
+def validate_start_time():
+    assert g.TARGET_START_TIME >= 0
+
+# SIMILARITY_THRESHOLD must be in the range [0...1)
+def validate_similarity_threshold():
+    assert g.SIMILARITY_THRESHOLD >= 0 and g.SIMILARITY_THRESHOLD < 1
+
+# TRIAGE_FAST must be an integer in the range [0, 1]
+def validate_triage_fast():
+    assert int(g.TRIAGE_FAST) == g.TRIAGE_FAST
+    assert g.TRIAGE_FAST in [0, 1]
+
 # X1, X2, and X3 must be in the range (0...1]
 # They cannot be exactly 0, otherwise bad things happen 
 # (like infinite loops)
@@ -66,3 +79,6 @@ def validate_all():
     validate_fuzzing_intensity()
     validate_construction_intensity()
     validate_verbosity()
+    validate_start_time()
+    validate_similarity_threshold()
+    validate_triage_fast()
