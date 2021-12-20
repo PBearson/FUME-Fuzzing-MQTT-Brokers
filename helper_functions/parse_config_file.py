@@ -70,3 +70,9 @@ def parse_config_file(config):
 
         elif arg[0] == "TARGET_START_TIME":
             g.TARGET_START_TIME = float(arg[1])
+
+        elif arg[0] == 'SIMILARITY_THRESHOLD':
+            g.SIMILARITY_THRESHOLD = float(arg[1])
+
+        elif arg[0] == 'TRIAGE_FAST':
+            g.TRIAGE_FAST = int(arg[1])
