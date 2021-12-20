@@ -31,7 +31,7 @@ def start_target():
 # Check if the input causes a crash. If it does, return True.
 # Else return False
 def check_input(input):
-
+    # TODO there may be times were the close() function fails because the send() function crashes the broker. We need to consider this.
     while True:
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -100,6 +100,7 @@ def triage(input, candidates = [], triage_level = 1):
                         candidates.append(new_input)
                         local_candidates.append(new_input)
                         print("Found new crash: %s" % new_input.hex())
+                        print("Total candidates: %d" % len(candidates))
 
                 # Restart the target
                 start_target()
@@ -112,16 +113,20 @@ def triage(input, candidates = [], triage_level = 1):
 
     # In the fast version, we only worry about the single candidate we logged
     if g.TRIAGE_FAST:
-        new_candidate = triage(candidates[0], candidates, triage_level + 1)
-        if len(new_candidate) < len(input):
-            input = new_candidate
+        if len(candidates) > 0:
+            new_candidate, _ = triage(candidates[0], [], triage_level + 1)
+            if len(new_candidate) < len(input):
+                input = new_candidate
 
     # In the slow version, we iterate over all new candidates we found
     else:
         for candidate in local_candidates:
-            new_candidate = triage(candidate, candidates, triage_level + 1)
+            new_candidate, new_locals = triage(candidate, candidates, triage_level + 1)
             if len(new_candidate) < len(input):
                 input = new_candidate
+            for local in new_locals:
+                if local not in candidates:
+                    candidates.append(local)
 
     # Calculate the percent decrease in the input size
     end_size = len(input)
@@ -129,10 +134,10 @@ def triage(input, candidates = [], triage_level = 1):
         reduction = 100 * (1 - (float(end_size) / float(start_size)))
         pv.normal_print("Input size reduced by %f%% (we are %d triage levels deep)" % (reduction, triage_level))
     else:
-        pv.verbose_print("Input size did not change (we are %d triage levels deep)" % triage_level)
+        pv.normal_print("Input size did not change (we are %d triage levels deep)" % triage_level)
 
     # Return the new input
-    return input
+    return input, local_candidates
     
 if __name__ == "__main__":
     input = bytearray.fromhex("101e00044d5154540502003c0000117c792d6d7174742d636c69656e742d696423020001c0005002000120020002")
@@ -150,13 +155,17 @@ if __name__ == "__main__":
     except IndexError:
         print("Usage: triage.py <config file>")
         exit(-1)
-    
-    # Star the target
+
+    # Start the target
     start_target()
 
     # Triage the input
+    if g.TRIAGE_FAST:
+        pv.normal_print("Using the FAST version")
+    else:
+        pv.normal_print("Using the SLOW version")
     start_size = len(input)
-    input = triage(input)
+    input, _ = triage(input)
     end_size = len(input)
     reduction = 100 * (1 - (float(end_size) / float(start_size)))
     print("New input: %s\nReduced by %f%%" % (input.hex(), reduction))
