@@ -107,3 +107,7 @@ VERBOSITY = 1
 
 ### The number of seconds it takes to start the target
 # TARGET_START_TIME = 0.5
+
+### For console responses, if they are at least this similar to any other
+### response, then we discard it.
+SIMILARITY_THRESHOLD = 0.3
