@@ -41,6 +41,12 @@ protocol_version = 0
 network_response_log = {}
 console_response_log = {}
 
+# Similarity threshold for console responses
+SIMILARITY_THRESHOLD = 0.3
+
 # Request queue parameters
 request_queue = []
 REQUEST_QUEUE_SIZE = 5
+
+# Triage parameters
+TRIAGE_FAST = 1
