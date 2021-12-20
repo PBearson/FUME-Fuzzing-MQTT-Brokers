@@ -20,12 +20,12 @@ def start_target():
     # Try to connect to the target
     pv.verbose_print("Starting target...")
     for i in range(10):
-        pv.verbose_print("Attempt %d" % (i + 1))
+        pv.debug_print("Attempt %d" % (i + 1))
         time.sleep(g.TARGET_START_TIME * ((i + 1)/5))
         alive = rt.check_connection()
         if alive:
             pv.verbose_print("Target started successfully!")
-            time.sleep(0.1)
+            time.sleep(0.25)
             return
 
 # Check if the input causes a crash. If it does, return True.
@@ -39,11 +39,12 @@ def check_input(input):
             s.send(input)
             s.close()
             break
-        except ConnectionResetError:
+        except (ConnectionResetError, ConnectionRefusedError):
+            pv.normal_print("Connection error. Trying again...")
             time.sleep(0.1)
             continue
 
-    time.sleep(0.05)
+    time.sleep(0.25)
 
     connection_status = rt.check_connection()
     
@@ -79,13 +80,26 @@ def triage(input, candidates = [], triage_level = 1):
             new_input = delete_block(input, i, delete_size)
             crash_status = check_input(new_input)
 
-            # If False crash status means the target actually crashed
+            # False crash status means the target actually crashed
             if crash_status is False:
                 # Log the input if it is unique
                 if new_input not in candidates:
-                    candidates.append(new_input)
-                    local_candidates.append(new_input)
-                    print("Found new crash: %s" % new_input.hex())
+
+                    # In the fast version, we only log a single candidate, and 
+                    # we only update that candidate when we find a smaller one
+                    if g.TRIAGE_FAST:
+                        if len(candidates) == 0:
+                            candidates.append(new_input)
+                            print("Found new crash: %s" % new_input.hex())
+                        elif len(new_input) < len(candidates[0]):
+                            candidates[0] = new_input
+                            print("Found new crash: %s" % new_input.hex())
+                        
+                    # In the slow version, we log all new candidates that we find
+                    else:
+                        candidates.append(new_input)
+                        local_candidates.append(new_input)
+                        print("Found new crash: %s" % new_input.hex())
 
                 # Restart the target
                 start_target()
@@ -95,10 +109,19 @@ def triage(input, candidates = [], triage_level = 1):
 
     # For each new candidate found in this instance, recursively triage them.
     # As newer, smaller candidates are found, update the input
-    for candidate in local_candidates:
-        new_candidate = triage(candidate, candidates, triage_level + 1)
+
+    # In the fast version, we only worry about the single candidate we logged
+    if g.TRIAGE_FAST:
+        new_candidate = triage(candidates[0], candidates, triage_level + 1)
         if len(new_candidate) < len(input):
             input = new_candidate
+
+    # In the slow version, we iterate over all new candidates we found
+    else:
+        for candidate in local_candidates:
+            new_candidate = triage(candidate, candidates, triage_level + 1)
+            if len(new_candidate) < len(input):
+                input = new_candidate
 
     # Calculate the percent decrease in the input size
     end_size = len(input)
@@ -132,5 +155,8 @@ if __name__ == "__main__":
     start_target()
 
     # Triage the input
+    start_size = len(input)
     input = triage(input)
-    print("New input: %s" % input.hex())
+    end_size = len(input)
+    reduction = 100 * (1 - (float(end_size) / float(start_size)))
+    print("New input: %s\nReduced by %f%%" % (input.hex(), reduction))
