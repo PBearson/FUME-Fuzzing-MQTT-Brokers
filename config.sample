@@ -111,3 +111,7 @@ VERBOSITY = 1
 ### For console responses, if they are at least this similar to any other
 ### response, then we discard it.
 SIMILARITY_THRESHOLD = 0.3
+
+### If set to 1, the 'fast' version of crash triage is used.
+### If set to 0, the 'slow' version is used.
+TRIAGE_FAST = 0
