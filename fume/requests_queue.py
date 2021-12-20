@@ -14,5 +14,6 @@ def print_queue():
     for index, req in enumerate(g.request_queue):
         pv.normal_print("%d: %s" % (index, req.hex()))
 
-    # TODO dump request queue to file
+    # TODO dump request queue to file - if we restart the target,
+    # then each queue should be stored in a new file.
     # TODO make request queue size a config var
