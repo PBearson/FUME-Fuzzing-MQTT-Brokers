@@ -162,13 +162,24 @@ def handle_select_or_generation_state(mm, packet):
         pv.debug_print("Payload so far: %s" % "".join([p.toString() for p in g.payload]))
     
 def handle_response_log_state(mm):
-    if len(g.network_response_log) > 0:
-        response = random.choice(list(g.network_response_log.keys()))
-        g.payload = g.network_response_log[response]
+    response_type_pick = random.randint(0, 1)
 
+    if response_type_pick == 0:
+        if len(g.network_response_log) > 0:
+            response = random.choice(list(g.network_response_log.keys()))
+            g.payload = g.network_response_log[response]
+
+        else:
+            mm.current_state = mm.state_connect
+            handle_state(mm)
     else:
-        mm.current_state = mm.state_connect
-        handle_state(mm)
+        if len(g.console_response_log) > 0:
+            response = random.choice(list(g.console_response_log.keys()))
+            g.payload = g.console_response_log[response]
+            # print("Chose payload: %s, %d" % (g.payload, len(g.payload)))
+        else:
+            mm.current_state = mm.state_connect
+            handle_state(mm)
 
 # Handle the next state in the model
 def handle_state(mm):
