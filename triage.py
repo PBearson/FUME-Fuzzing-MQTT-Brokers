@@ -26,13 +26,14 @@ buffer_len = 10
 def check_buffer():
     global buffer
 
-    for b in buffer:
+    for b in reversed(buffer):
         # print("Checking %s" % b.hex())
         status = check_input(b, 0.25)
         if status == False:
             return b
 
     # Either false positive, or the buffer did not capture the correct packet :(
+    pv.normal_print("A crash was detected, but it could not be replicated.")
     return None 
 
 
@@ -96,6 +97,46 @@ def delete_random(input, delete_size):
 def delete_block(input, index, delete_size):
     return input[:index] + input[index + delete_size:]
 
+def check_for_crash(input, candidates, local_candidates):
+    crash_status = check_input(input)
+    update_buffer(input)
+
+    # False crash status means the target actually crashed
+    if crash_status is False:
+
+        # Restart the target
+        start_target()
+
+        # Check which input actually caused the crash
+        new_input = check_buffer()
+        
+        # If None, then the target did not crash
+        if new_input is None:
+            return
+
+        # Restart the target since check_buffer() crashed it
+        start_target()
+
+        # Log the input if it is unique
+        if new_input not in candidates:
+
+            # In the fast version, we only log a single candidate, and 
+            # we only update that candidate when we find a smaller one
+            if g.TRIAGE_FAST:
+                if len(candidates) == 0:
+                    candidates.append(new_input)
+                    pv.normal_print("Found new crash: %s" % new_input.hex())
+                elif len(new_input) < len(candidates[0]):
+                    candidates[0] = new_input
+                    pv.normal_print("Found new crash: %s" % new_input.hex())
+                
+            # In the slow version, we log all new candidates that we find
+            else:
+                candidates.append(new_input)
+                local_candidates.append(new_input)
+                pv.normal_print("Found new crash: %s" % new_input.hex())
+
+    return candidates, local_candidates
 
 
 # Triage the current input and return a tuple of (reduced_input, new_candidates)
@@ -110,7 +151,7 @@ def triage(input, candidates = [], triage_level = 1):
     delete_size = 1
     local_candidates = []
 
-    # call delete_block() for as long as possible
+    # Delete bytes for as long as possible
     while delete_size < len(input):
         pv.verbose_print("Delete size is now %d" % delete_size)
         i = 0
@@ -118,47 +159,16 @@ def triage(input, candidates = [], triage_level = 1):
         # Delete a block of size delete_size at index i
         while i + delete_size <= len(input):
             new_input = delete_block(input, i, delete_size)
-            crash_status = check_input(new_input)
-            update_buffer(new_input)
-
-            # False crash status means the target actually crashed
-            if crash_status is False:
-
-                # Restart the target
-                start_target()
-
-                # Check which input actually caused the crash
-                new_input = check_buffer()
-               
-                if new_input is None:
-                    continue
-
-                # Restart the target since check_buffer() crashed it
-                start_target()
-
-                # Log the input if it is unique
-                if new_input not in candidates:
-
-                    # In the fast version, we only log a single candidate, and 
-                    # we only update that candidate when we find a smaller one
-                    if g.TRIAGE_FAST:
-                        if len(candidates) == 0:
-                            candidates.append(new_input)
-                            pv.normal_print("Found new crash: %s" % new_input.hex())
-                        elif len(new_input) < len(candidates[0]):
-                            candidates[0] = new_input
-                            pv.normal_print("Found new crash: %s" % new_input.hex())
-                        
-                    # In the slow version, we log all new candidates that we find
-                    else:
-                        candidates.append(new_input)
-                        local_candidates.append(new_input)
-                        pv.normal_print("Found new crash: %s" % new_input.hex())
+            check_for_crash(new_input, candidates, local_candidates)
             i += 1
 
         # Delete delete_size number of bytes at random indices
+        random_iterations = round(len(input) / delete_size)
+        for j in range(random_iterations):
+            new_input = delete_random(input, delete_size)
+            check_for_crash(new_input, candidates, local_candidates)
 
-
+        # Update the delete size
         delete_size *= 2
 
     # For each new candidate found in this instance, recursively triage them.
