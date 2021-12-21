@@ -10,12 +10,15 @@ import fume.handle_console_response as fcr
 # Check if the connection is a live
 def check_connection():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.connect((g.TARGET_ADDR, g.TARGET_PORT))
-        s.close()
-        return True
-    except ConnectionRefusedError:
-        return False
+    while True:
+        try:
+            s.connect((g.TARGET_ADDR, g.TARGET_PORT))
+            s.close()
+            return True
+        except ConnectionRefusedError:
+            return False
+        except ConnectionResetError:
+            continue
 
 
 # Run the target, unless the start command is left blank
