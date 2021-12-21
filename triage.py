@@ -25,31 +25,31 @@ def start_target():
         alive = rt.check_connection()
         if alive:
             pv.verbose_print("Target started successfully!")
-            time.sleep(0.25)
+            time.sleep(0.1)
             return
+
+    pv.print_error("Could not start target")
+    exit(-1)
 
 # Check if the input causes a crash. If it does, return True.
 # Else return False
 def check_input(input):
     # TODO there may be times were the close() function fails because the send() function crashes the broker. We need to consider this.
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect((g.TARGET_ADDR, g.TARGET_PORT))
-            s.send(input)
+            s.send(input)      
             s.close()
             break
         except (ConnectionResetError, ConnectionRefusedError):
             pv.normal_print("Connection error. Trying again...")
             time.sleep(0.1)
             continue
-
-    time.sleep(0.25)
-
-    connection_status = rt.check_connection()
     
-    return connection_status
-
+    time.sleep(0.2)
+    return rt.check_connection()
+    
 # Return an input with a block of size mutate_size changed to 
 # 'A' bytes, beginning at the index.
 def mutate_block(input, index, mutate_size):
@@ -67,7 +67,13 @@ def delete_random(input, delete_size):
 def delete_block(input, index, delete_size):
     return input[:index] + input[index + delete_size:]
 
+# Triage the current input and return a tuple of (reduced_input, new_candidates)
+# where reduced_input is a smaller input that still crashes the target,
+# and new_candidates is any intermediate inputs we found on the way
 def triage(input, candidates = [], triage_level = 1):
+    if triage_level > g.TRIAGE_MAX_DEPTH:
+        return input, []
+
     pv.normal_print("Triaging input %s" % input.hex())
     start_size = len(input)
     delete_size = 1
@@ -100,7 +106,6 @@ def triage(input, candidates = [], triage_level = 1):
                         candidates.append(new_input)
                         local_candidates.append(new_input)
                         print("Found new crash: %s" % new_input.hex())
-                        print("Total candidates: %d" % len(candidates))
 
                 # Restart the target
                 start_target()
