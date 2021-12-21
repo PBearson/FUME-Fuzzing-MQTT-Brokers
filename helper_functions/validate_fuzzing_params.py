@@ -34,6 +34,11 @@ def validate_triage_fast():
     assert int(g.TRIAGE_FAST) == g.TRIAGE_FAST
     assert g.TRIAGE_FAST in [0, 1]
 
+# TRIAGE_MAX_DEPTH must be an integer greater than 0
+def validate_triage_max_depth():
+    assert int(g.TRIAGE_MAX_DEPTH) == g.TRIAGE_MAX_DEPTH
+    assert g.TRIAGE_MAX_DEPTH > 0
+
 # X1, X2, and X3 must be in the range (0...1]
 # They cannot be exactly 0, otherwise bad things happen 
 # (like infinite loops)

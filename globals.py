@@ -50,3 +50,4 @@ REQUEST_QUEUE_SIZE = 5
 
 # Triage parameters
 TRIAGE_FAST = 1
+TRIAGE_MAX_DEPTH = 3

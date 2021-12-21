@@ -115,3 +115,8 @@ SIMILARITY_THRESHOLD = 0.3
 ### If set to 1, the 'fast' version of crash triage is used.
 ### If set to 0, the 'slow' version is used.
 TRIAGE_FAST = 0
+
+### The maximum depth that the crash triage script may reach.
+### Higher depths may find smaller inputs, but it will probably 
+take a while to find them.
+TRIAGE_MAX_DEPTH = 3

@@ -76,3 +76,6 @@ def parse_config_file(config):
 
         elif arg[0] == 'TRIAGE_FAST':
             g.TRIAGE_FAST = int(arg[1])
+
+        elif arg[0] == 'TRIAGE_MAX_DEPTH':
+            g.TRIAGE_MAX_DEPTH = int(arg[1])
