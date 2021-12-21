@@ -12,14 +12,20 @@ def check_similarity(line):
             return True
     return False
 
+# Handle responses from the target's console, AKA, stdout
+# We listen for new messages, and when those messages are unique enough,
+# we log them
 def handle_console_response(proc):
     for line in iter(proc.stdout.readline, b''):
-        # TODO add similarity threshold to config file
-        # TODO log line if it is unique enough
-        if len(line) == 0:
-            continue
+
+        # Ignore lines that we have seen already
         if line not in g.console_response_log:
+
+            # Check the similarity between this line and others we have logged
             similarity = check_similarity(line)
+
+            # If it is unique enough, log it
+            # TODO we need a way to better check if we have just sent a payload to the target
             if similarity is False and type(g.payload) is bytearray:
                 g.console_response_log[line] = g.payload
                 pv.normal_print("Found new console response (%d found)" % len(g.console_response_log.keys()))
