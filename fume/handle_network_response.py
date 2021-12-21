@@ -23,7 +23,7 @@ def handle_network_response(recv):
             # G_fields = str(parser.parser.G_fields) + str(parser.parser.H_fields)
             if G_fields not in g.network_response_log.keys():
                 g.network_response_log[G_fields] = g.payload
-                pv.normal_print("Found new response (%d found)" % len(g.network_response_log.keys()))
+                pv.normal_print("Found new network response (%d found)" % len(g.network_response_log.keys()))
 
             index +=  2 * (parser.parser.remainingLengthToInteger()) + 2 + len(parser.parser.remaining_length)
 
