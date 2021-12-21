@@ -6,6 +6,10 @@ A successor to [MosquittoByte](https://github.com/PBearson/MosquittoByte).
 
 ## Get Started
 
+## Configuring your Fuzzing Session
+
+## Crash Triage
+
 ## Bugs Discovered with FUME
 
 If you want to test FUME yourself on the same brokers we did, please refer to [this repository](https://github.com/PBearson/FUME_Targets).
