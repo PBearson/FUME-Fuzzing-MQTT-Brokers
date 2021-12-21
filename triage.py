@@ -227,8 +227,21 @@ if __name__ == "__main__":
         pv.normal_print("Using the FAST version")
     else:
         pv.normal_print("Using the SLOW version")
-    start_size = len(input)
-    input, _ = triage(input)
-    end_size = len(input)
-    reduction = 100 * (1 - (float(end_size) / float(start_size)))
-    print("New input: %s\nReduced by %f%%" % (input.hex(), reduction))
+
+    run = 1
+    first_start_size = len(input)
+    while True:
+        pv.normal_print("RUN #%d" % run)
+        start_size = len(input)
+        input, _ = triage(input)
+        end_size = len(input)
+        reduction = 100 * (1 - (float(end_size) / float(start_size)))
+        if end_size == start_size:
+            print("Input size did not change.")
+            break
+        else:
+            print("New input: %s\nReduced by %f%%" % (input.hex(), reduction))
+            run += 1
+
+    reduction = 100 * (1 - (float(end_size) / float(first_start_size)))
+    print("FINAL INPUT: %s\nReduced by %f%%" % (input.hex(), reduction))
