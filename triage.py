@@ -88,7 +88,7 @@ def mutate_block(input, index, mutate_size):
 # Delete from random indices in the input
 def delete_random(input, delete_size):
     for d in range(delete_size):
-        index = random.randint(0, len(input))
+        index = random.randint(0, len(input) - 1)
         input = input[:index] + input[index + 1:]
     return input
 
@@ -203,7 +203,7 @@ def triage(input, candidates = [], triage_level = 1):
     return input, local_candidates
     
 if __name__ == "__main__":
-    input = bytearray.fromhex("101e00044d5154540502003c0000117c792d6d7174742d636c69656e742d696423020001c0005002000120020002")
+    input = bytearray.fromhex("101000044d5154540502003c0321001400009004000100002f020001")
 
     # Try to parse the supplied config file.
     # If one is not supplied, use the default values.
