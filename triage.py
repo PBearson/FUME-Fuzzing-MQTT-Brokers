@@ -18,7 +18,7 @@ import fume.run_target as rt
 buffer = []
 buffer_len = 10
 
-# Sometimes the broker will crash a moment or 2 after a bad packet is send.
+# Sometimes the broker will crash a moment or 2 after a bad packet is sent.
 # If a new (non-buggy) packet has already been sent by then, we may falsely
 # believe the new packet is responsible for the crash. Therefore, we use a 
 # buffer to hold the most recent packets and call this function to verify
@@ -27,7 +27,6 @@ def check_buffer():
     global buffer
 
     for b in reversed(buffer):
-        # print("Checking %s" % b.hex())
         status = check_input(b, 0.25)
         if status == False:
             return b
@@ -36,6 +35,16 @@ def check_buffer():
     pv.normal_print("A crash was detected, but it could not be replicated.")
     return None 
 
+# Check the crash log for the payload which is responsible for the crash.
+def check_crash_log(crash_log):
+    for c in reversed(crash_log):
+        c_bytes = bytearray.fromhex(c)
+        status = check_input(c_bytes, 0.25)
+        if status == False:
+            pv.normal_print("A crash was detected from the following input: %s" % c)
+            return c_bytes
+    pv.print_error("The crash log does not seem to contain a payload which crashes this target.")
+    exit(-1)
 
 def update_buffer(input):
     global buffer
@@ -203,23 +212,38 @@ def triage(input, candidates = [], triage_level = 1):
     return input, local_candidates
     
 if __name__ == "__main__":
-    input = bytearray.fromhex("101000044d5154540502003c0321001400009004000100002f020001")
-
     # Try to parse the supplied config file.
-    # If one is not supplied, use the default values.
     try:
-        config_f = open(sys.argv[1], 'r')
+        config_f = open(sys.argv[2], 'r')
         config = config_f.readlines()
         pcf.parse_config_file(config)
         config_f.close()
     except FileNotFoundError:
-        print("Could not find the supplied file: %s" % sys.argv[1])
+        pv.print_error("Could not find the supplied config file file: %s" % sys.argv[2])
         exit(-1)
     except IndexError:
-        print("Usage: triage.py <config file>")
+        pv.print_error("Usage: triage.py <crash log file> <config file>")
+        exit(-1)
+
+    # Load the crash log
+    try:
+        crash_f = open(sys.argv[1], 'r')
+        crash_log = crash_f.readlines()
+        config_f.close()
+    except FileNotFoundError:
+        pv.print_error("Could not find the supplied crash file: %s" % sys.argv[1])
+        exit(-1)
+    except IndexError:
+        pv.print_error("Usage: triage.py <crash log file> <config file>")
         exit(-1)
 
     # Start the target
+    start_target()
+
+    # Find the right input from the crash log
+    input = check_crash_log(crash_log)
+
+    # Restart the target, since check_crash_log() probably crashed it
     start_target()
 
     # Triage the input
