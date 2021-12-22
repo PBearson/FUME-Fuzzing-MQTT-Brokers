@@ -120,3 +120,9 @@ TRIAGE_FAST = 0
 ### Higher depths may find smaller inputs, but it will probably 
 take a while to find them.
 TRIAGE_MAX_DEPTH = 3
+
+### Provide the crash directory
+CRASH_DIRECTORY = crashes
+
+### Provide the crash filename prefix. This will be appended with a timestamp.
+CRASH_FILENAME_PREFIX = TARGET_START_TIME

@@ -51,3 +51,7 @@ REQUEST_QUEUE_SIZE = 5
 # Triage parameters
 TRIAGE_FAST = 1
 TRIAGE_MAX_DEPTH = 3
+
+# Crash log parameters
+CRASH_DIRECTORY = "crashes"
+CRASH_FILENAME_PREFIX = "target"

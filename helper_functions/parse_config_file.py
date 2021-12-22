@@ -79,3 +79,15 @@ def parse_config_file(config):
 
         elif arg[0] == 'TRIAGE_MAX_DEPTH':
             g.TRIAGE_MAX_DEPTH = int(arg[1])
+
+        elif arg[0] == 'CRASH_DIRECTORY':
+            g.CRASH_DIRECTORY = arg[1]
+
+        elif arg[0] == 'CRASH_FILENAME_PREFIX':
+            g.CRASH_FILENAME_PREFIX = arg[1]
+
+
+
+        else:
+            print("Unrecognized key in config file: %s" % arg[0])
+            exit(-1)
