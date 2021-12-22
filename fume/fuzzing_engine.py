@@ -120,7 +120,7 @@ def handle_delete_state():
     delete_len = random.randint(1, round(maxlen))
 
     for d in range(delete_len):
-        index = random.randint(0, len(g.payload))
+        index = random.randint(0, len(g.payload) - 1)
         g.payload = g.payload[:index] + g.payload[index + 1:]
 
     pv.debug_print("Fuzzed payload now (deleted %d bytes): %s" % (delete_len, binascii.hexlify(g.payload)))
