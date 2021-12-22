@@ -9,7 +9,10 @@ def push(request):
 
 # Print requests queue
 def print_queue():
-    pv.normal_print("Request queue (starting from most recent:")
+    if len(g.request_queue) == 0:
+        return
+
+    pv.normal_print("Request queue (starting from most recent):")
     g.request_queue.reverse()
     for index, req in enumerate(g.request_queue):
         pv.normal_print("%d: %s" % (index, req.hex()))

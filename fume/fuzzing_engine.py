@@ -19,6 +19,7 @@ import requests_queue as rq
 
 import helper_functions.print_verbosity as pv
 import helper_functions.determine_protocol_version as dpv
+import helper_functions.crash_logging as cl
 import globals as g
 
 import random
@@ -43,12 +44,18 @@ def handle_send_state():
         pv.verbose_print("Sending payload to the target: %s" % binascii.hexlify(g.payload))
         s.connect((g.TARGET_ADDR, g.TARGET_PORT))
         s.send(g.payload)
-        # TODO after we send the payload, we can log it in a limited-sized queue.
-        # When the broker crashes, we print the traceback of the queue
+
+        # After we send the payload, we can log it in a limited-sized queue.
         rq.push(g.payload)
+
+    # Connection failed -- we found a crash!
     except ConnectionRefusedError:
         pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
+
+        # Print the request queue and dump it to a file
         rq.print_queue()
+        cl.dump_request_queue()
+
         exit(-1)
 
     # Get the response from the target
