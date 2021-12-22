@@ -10,6 +10,7 @@ from generators.auth import Auth
 import helper_functions.validate_fuzzing_params as vfp
 import helper_functions.parse_config_file as pcf
 import helper_functions.print_configuration as pc
+import helper_functions.crash_logging as cl
 
 import globals as g
 
@@ -53,6 +54,9 @@ def main():
 
     # Validate all parameters
     vfp.validate_all()
+
+    # Create crash directory if needed
+    cl.create_crash_directory()
 
     # Print fuzzing configuration
     pc.print_configuration()
