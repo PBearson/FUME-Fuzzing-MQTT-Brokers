@@ -4,6 +4,8 @@ A successor to [MosquittoByte](https://github.com/PBearson/MosquittoByte).
 
 ![FUME Markov Models](images/fuzz_algorithm_both.jpg)
 
+A demo of FUME can be viewed [on Youtube](https://www.youtube.com/watch?v=99gAayiIcEo).
+
 ## Get Started
 
 ## Configuring your Fuzzing Session
