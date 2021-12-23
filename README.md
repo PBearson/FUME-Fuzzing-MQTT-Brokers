@@ -4,6 +4,10 @@ A successor to [MosquittoByte](https://github.com/PBearson/MosquittoByte).
 
 ![FUME Markov Models](images/fuzz_algorithm_both.jpg)
 
+FUME is a fuzzing engine targeted directly at MQTT brokers. It both generation-guided and mutation-guided fuzzing techniques to craft fuzzy MQTT payloads to send to your target. It also leverages a response feedback mechanism for monitoring new behavior from the broker -- specifically, behavior in the form of MQTT responses and console responses (standard output). When FUME spots sufficiently new behavior, the responsible request to an input queue for further fuzzing later on.
+
+FUME is modeled as a finite state machine using Markov modeling. Basically, FUME needs to make several choices during a single fuzzing round, such as whether to select mutation-guided or generation-guided fuzzing, which packet types to select or generate, how intensely to fuzz the input seed (and which fuzzing operations are carried out), etc. To illustrate this decision-making process, we model it as a stochastic process with several parameters that are fully configurable by the end user. For example, as shown in the figure above, the user could give `X1` a high probability (e.g., 0.9) and `X2` a low probability (e.g., 0.1). This would produce input seeds that are small (e.g., a single CONNECT packet) but heavily fuzzed. The full details of FUME are provided in the research paper, which will become available at a later date.
+
 A demo of FUME can be viewed [on Youtube](https://www.youtube.com/watch?v=99gAayiIcEo).
 
 ## Get Started
