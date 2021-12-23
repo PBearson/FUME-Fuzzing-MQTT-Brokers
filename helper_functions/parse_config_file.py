@@ -3,9 +3,15 @@ import globals as g
 # Parse the supplied config file
 def parse_config_file(config):
     for line in config:
+
         # Only valid key-value pairs
         line = line.strip()
         line = line.replace(" ","")
+
+        # The user can use @@ to re-insert spaces if they need to - for 
+        # example, if the start command requires multiple words (e.g.,
+        # "node <script location>")
+        line = line.replace("@@", " ")
         if len(line) == 0 or line[0] == '#':
             continue
     
