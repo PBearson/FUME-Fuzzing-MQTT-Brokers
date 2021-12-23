@@ -125,4 +125,4 @@ TRIAGE_MAX_DEPTH = 3
 CRASH_DIRECTORY = crashes
 
 ### Provide the crash filename prefix. This will be appended with a timestamp.
-CRASH_FILENAME_PREFIX = TARGET_START_TIME
+CRASH_FILENAME_PREFIX = target
