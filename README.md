@@ -1,6 +1,6 @@
 # FUME: Fuzzing MQTT Brokers
 
-A successor to [MosquittoByte](https://github.com/PBearson/MosquittoByte).
+## Introduction
 
 ![FUME Markov Models](images/fuzz_algorithm_both.jpg)
 
