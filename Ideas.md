@@ -17,3 +17,7 @@ Right now, when the fuzzer selects an input from the response log, the chance of
 ## Prioritize inputs from the response log according to the order they are found
 
 Inputs from the response log are selected completely randomly, regardless of when they are discovered or any other factors. It would be much better to select these inputs in the order that they are found. A circular queue will get the job done.
+
+## Verify console responses
+
+To monitor console responses, FUME executes the target as a process a thread to monitor its output. Since this thread runs asynchronously to the main fuzzing script, it is possible for the payload to reset before the console response is received and processed. To avoid this, we should verify which input triggers the console response in question. If none of the tested inputs trigger the console response, then chances are likely either 1) it was not directly caused by the user's input, or 2) it was a state-dependent response. In either case, that response cannot possibly be represented by a single input, so we ignore it.
