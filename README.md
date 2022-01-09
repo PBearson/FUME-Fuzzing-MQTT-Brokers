@@ -2,9 +2,10 @@
 
 ## Table of Contents
 1. [Introduction](#introduction)
-2. [Configuring your Fuzzing Session](#config)
-3. [Crash Triage](#triage)
-4. [Bugs Discovered with FUME](#discoveries)
+2. [Get Started](#get-started)
+3. [Configuring your Fuzzing Session](#configuring-your-fuzzing-session)
+4. [Crash Triage](#crash-triage)
+5. [Bugs Discovered with FUME](#bugs-discovered-with-fume)
 
 ## Introduction
 
