@@ -13,3 +13,7 @@ Since we already have an option for restricting how large a payload can get, a l
 ## Add `CHOOSE_NETWORK_RESPONSE` option (alternatively, split `b` into `b1` and `b2`)
 
 Right now, when the fuzzer selects an input from the response log, the chance of selecting from the network response log is 50% (same with console response log, obviously). There is no reason why the user should not be able to set this probability. In truth, this also probably warrants a modification to the Markov model.
+
+## Prioritize inputs from the response log according to the order they are found
+
+Inputs from the response log are selected completely randomly, regardless of when they are discovered or any other factors. It would be much better to select these inputs in the order that they are found. A circular queue will get the job done.
