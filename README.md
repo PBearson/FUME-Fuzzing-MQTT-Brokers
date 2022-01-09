@@ -1,5 +1,8 @@
 # FUME: Fuzzing MQTT Brokers
 
+## Table of Contents
+1. [Introduction](#introduction)
+
 ## Introduction
 
 ![FUME Markov Models](images/fuzz_algorithm_both.jpg)
@@ -36,13 +39,19 @@ You can pass a configuration file as an argument to customize your fuzzing sessi
 python3 fuzz.py <config file>
 ```
 
-The configuration file is defined as a list of key-value pairs, separated by a = sign. FUME supports a fairly extensive number of configuration options. The obvious ones are the Markov model parameters, i.e., `X1`, `X2`, `X3`, `b`, etc. However, there are several more options that are worth mentioning directly:
+The configuration file is defined as a list of key-value pairs, separated by a `=` sign. FUME supports a fairly extensive number of configuration options. The obvious ones are the Markov model parameters, i.e., `X1`, `X2`, `X3`, `b`, etc. However, there are several more options that are worth mentioning directly:
 
 * `TARGET_ADDR` and `TARGET_PORT` define the target IP address and port.
 * `START_COMMAND` sets the command for starting the target directly. This is the only way to monitor console responses.
 * `TARGET_START_TIME` sets the expected amount of time it takes for the target to start up (and more specifically, to expose its MQTT port).
 * `SIMILARITY_THRESHOLD` sets the similarity threshold value for console responses. FUME discards responses that are at least this similar to previously seen responses. For instance, a value of 0.3 means that if a console response is at least 30% similar to any previously seen response, then it is not logged.
 * `CRASH_DIRECTORY` and `CRASH_FILENAME_PREFIX` set the directory and filename prefix of the request queue when it is dumped due to a crash. The file always has the structure `<CRASH_DIRECTORY>/<CRASH_FILENAME_PREFIX>-<timestamp>`.
+
+The script will strip all whitespace away from the config file to parse it more easily. If, for some reason, you need whitespace in one of your options, just place a `@@` wherever you want to place the whitespace. You will probably only want this when you set `START_COMMAND`, for example:
+
+`
+START_COMMAND = node@@aedes.js # --> Parsed as 'node aedes.js'
+`
 
 The full list of supported configuration options can be viewed in the file _config.sample_.
 
