@@ -2,6 +2,9 @@
 
 ## Table of Contents
 1. [Introduction](#introduction)
+2. [Configuring your Fuzzing Session](#config)
+3. [Crash Triage](#triage)
+4. [Bugs Discovered with FUME](#discoveries)
 
 ## Introduction
 
@@ -31,7 +34,7 @@ python3 fuzz.py
 
 You will see a printout of your configuration, and the fuzzing session will begin. As it runs, it will alert you when unique network responses are detected. If you get lucky, the target will eventually crash, and you will see a dump of the last 5 payloads that FUME sent to the target. These payloads are also logged to a file for analysis later on.
 
-## Configuring your Fuzzing Session
+## Configuring Your Fuzzing Session
 
 You can pass a configuration file as an argument to customize your fuzzing session:
 
