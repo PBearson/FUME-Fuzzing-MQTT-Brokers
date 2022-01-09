@@ -126,3 +126,6 @@ CRASH_DIRECTORY = crashes
 
 ### Provide the crash filename prefix. This will be appended with a timestamp.
 CRASH_FILENAME_PREFIX = target
+
+### Self-explanatory
+MAXIMUM_PAYLOAD_LENGTH = 10000

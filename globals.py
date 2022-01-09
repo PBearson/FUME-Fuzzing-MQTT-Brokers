@@ -55,3 +55,6 @@ TRIAGE_MAX_DEPTH = 3
 # Crash log parameters
 CRASH_DIRECTORY = "crashes"
 CRASH_FILENAME_PREFIX = "target"
+
+# Self-explanatory 
+MAXIMUM_PAYLOAD_LENGTH = 10000

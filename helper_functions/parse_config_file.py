@@ -92,7 +92,8 @@ def parse_config_file(config):
         elif arg[0] == 'CRASH_FILENAME_PREFIX':
             g.CRASH_FILENAME_PREFIX = arg[1]
 
-
+        elif arg[0] == 'MAXIMUM_PAYLOAD_LENGTH':
+            g.MAXIMUM_PAYLOAD_LENGTH = int(arg[1])
 
         else:
             print("Unrecognized key in config file: %s" % arg[0])

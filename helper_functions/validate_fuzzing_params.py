@@ -72,6 +72,11 @@ def validate_verbosity():
     assert int(g.VERBOSITY) == g.VERBOSITY
     assert g.VERBOSITY >= 0 and g.VERBOSITY <= 3
 
+# MAX_PAYLOAD_LENGTH must be an integer greater than 4
+def validate_max_payload_length():
+    assert int(g.MAXIMUM_PAYLOAD_LENGTH) == g.MAXIMUM_PAYLOAD_LENGTH
+    assert g.MAXIMUM_PAYLOAD_LENGTH > 4
+
 # Validate all parameters of the fuzzing engine
 def validate_all():
     validate_X()
@@ -87,3 +92,5 @@ def validate_all():
     validate_start_time()
     validate_similarity_threshold()
     validate_triage_fast()
+    validate_triage_max_depth()
+    validate_max_payload_length()
