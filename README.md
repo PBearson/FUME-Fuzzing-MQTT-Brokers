@@ -61,19 +61,21 @@ The full list of supported configuration options can be viewed in the file _conf
 
 ## Crash Triage
 
-There is a supplementary triage script that takes a crash dump file, identifies which input causes the crash, and tries to make them as small as possible. There are 2 obvious benefits to such a script. The first benefit is that we can know exactly which input causes a crash. The second benefit is that a smaller input is generally easier to analyze and debug. To run the triage script, simply provide a crash dump file and configuration file:
+There is a supplementary triage script that takes a crash dump file, identifies which input causes the crash, and tries to minimize the input as much as possible. There are 2 obvious benefits to doing this. The first benefit is that we can know exactly which input causes a crash, instead of manually testing every input in the dump file. The second benefit is that a smaller input is generally easier to analyze and debug.
+
+To run the triage script, simply provide a crash dump file and configuration file:
 
 ```
 python3 triage.py <crash log file> <config file>
 ```
 
-Note that the config file is required here. You MUST provide the `START_COMMAND` option, since this script will probably need to restart the broker many times.
+Note that the config file is a required argument. You MUST provide the `START_COMMAND` option, since this script will probably need to restart the broker many times.
 
 The triage algorithm is very simple, as it only removes byte blocks of sizes 1, 2, 4, 8, etc. from the input, and checks whether the new input causes a crash. If so (and if this input has never been seen before), it is added to a queue and tested further at a later point in time. We also remove bytes at random positions in the input and see if that works. Despite the simplicity, this approach works well enough and can easily reduce a payload by >= 25%.
 
-An important concept we have introduced in our script is **triage depth**, which basically tells us how many times an input has been modified (and resulted in a crash). For example, suppose we have inputs A, B, and C, where we modified A to get to B, and we modified B to get to C. Then A would have a triage depth (or level) of 1, B would have a depth of 2, and C would have a depth of 3.  The reason this is important is because in some cases, a program bug is not very sensitive to input changes, and thus, small changes in the input (e.g., removing a single byte) still cause a crash. Inevitably, this leads to tons of entries in the input queue, which substantially increases the triage time (often by several hours).
+An important concept we have introduced in our script is **triage depth**, which basically tells us how many times an input has been modified (and resulted in a crash). For example, suppose we have inputs A, B, and C, where we modified A to get to B, and we modified B to get to C. Then A would have a triage depth (or level) of 1, B would have a depth of 2, and C would have a depth of 3. In some cases, a program bug may be insensitive to input changes, and thus, small changes in the input (e.g., removing a single byte) still cause a crash. Inevitably, this leads to inputs with large triage depths, which substantially increases the triage time (often by several hours).
 
-To mitigate the above scenario, we have implemented two solutions to speed up the triage script. First, by default, every new input that triggers a crash is logged to the queue. However, another option is to only add the _smallest_ input that is produced at a given triage depth. For example, suppose we have inputs A, B1, B2, and B3, such that modifying A produced inputs B1, B2, and B3. Then we only keep the smallest of the produced inputs. This setting can be enabled by adding the following line to your config file: `TRIAGE_FAST = 1`
+To mitigate the above scenario, we have implemented two solutions to speed up the triage script. First, by default, every unique input that triggers a crash is logged to the queue. However, another option is to only add the _smallest_ input that is produced at a given triage depth. For example, suppose we have inputs A, B1, B2, and B3, such that modifying A produced inputs B1, B2, and B3. Then we only keep one of B1, B2, and B3 - whichever is smallest. This setting can be enabled by adding the following line to your config file: `TRIAGE_FAST = 1`
 
 Second, you can limit the maximum triage depth of the script, which effectively limits how many times a given input can be mutated. In the previous example, we mutated A to get to B, and we mutated B to get to C. If our maximum triage depth is 3, then we will not mutate C any further and simply move on to other inputs. By default, this depth value is 3, but you can set it to any value by adding the following line to your config file: `TRIAGE_MAX_DEPTH = <value>`
 
