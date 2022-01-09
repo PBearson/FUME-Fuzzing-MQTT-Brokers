@@ -20,6 +20,8 @@ import requests_queue as rq
 import helper_functions.print_verbosity as pv
 import helper_functions.determine_protocol_version as dpv
 import helper_functions.crash_logging as cl
+import helper_functions.get_payload_length as gpl
+
 import globals as g
 
 import random
@@ -38,6 +40,9 @@ def corpus_to_array(file):
 def handle_send_state():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(0.05)
+
+    # TODO make this part optional
+    g.payload = g.payload[:g.MAXIMUM_PAYLOAD_LENGTH]
 
     # Connect to the target and send the payload
     try:
@@ -89,7 +94,7 @@ def handle_s2_state(mm):
 # Default behavior is to inject between 1 and 10 times the length
 # of the payload, up to a defined maximum payload length 
 def handle_bof_state():
-    if len(g.payload) >= 10000:
+    if gpl.get_payload_length() >= g.MAXIMUM_PAYLOAD_LENGTH:
         return
 
     minlen = (1 + g.FUZZING_INTENSITY) * len(g.payload)
@@ -105,7 +110,7 @@ def handle_bof_state():
 
 # Inject some bytes into the payload
 def handle_nonbof_state():
-    if len(g.payload) >= 10000:
+    if gpl.get_payload_length() >= g.MAXIMUM_PAYLOAD_LENGTH:
         return
 
     maxlen = len(g.payload) * g.FUZZING_INTENSITY
@@ -149,6 +154,9 @@ def handle_mutate_state():
 # mm: the markov model
 # packet: a Packet class 
 def handle_select_or_generation_state(mm, packet):
+    if gpl.get_payload_length() >= g.MAXIMUM_PAYLOAD_LENGTH:
+        return
+
     state_name = mm.current_state.name
 
     if mm.model_type == 'mutation':
@@ -167,7 +175,9 @@ def handle_select_or_generation_state(mm, packet):
         g.payload.append(payload)
         pv.debug_print("Added payload %s" % payload.toString())
         pv.debug_print("Payload so far: %s" % "".join([p.toString() for p in g.payload]))
-    
+
+# In the response log state, we select either a network response 
+# or console response
 def handle_response_log_state(mm):
     response_type_pick = random.randint(0, 1)
 
@@ -183,7 +193,6 @@ def handle_response_log_state(mm):
         if len(g.console_response_log) > 0:
             response = random.choice(list(g.console_response_log.keys()))
             g.payload = g.console_response_log[response]
-            # print("Chose payload: %s, %d" % (g.payload, len(g.payload)))
         else:
             mm.current_state = mm.state_connect
             handle_state(mm)
@@ -280,12 +289,7 @@ def handle_state(mm):
 # Run the fuzzing engine (indefinitely)
 # mm: the markov model
 def run_fuzzing_engine(mm):
-    # file = open("benchmark.txt", "w")
-    # file.close()
-
     while True:
-    # for i in range(10000):
-        # Select model type
         model_types = ['mutation', 'generation']
         mm.model_type = random.choices(model_types, weights=[g.CHOOSE_MUTATION, 1 - g.CHOOSE_MUTATION])[0]
         pv.verbose_print("Selected model type %s" % mm.model_type)
@@ -309,6 +313,3 @@ def run_fuzzing_engine(mm):
             pv.verbose_print("In state %s" % mm.current_state.name)
             handle_state(mm)
             mm.next_state()
-        # file = open("benchmark.txt", "a")
-        # file.write("%d\n" % len(g.network_response_log.keys()))
-        # file.close()
