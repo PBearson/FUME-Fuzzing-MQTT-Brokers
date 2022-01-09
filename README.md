@@ -61,6 +61,16 @@ The full list of supported configuration options can be viewed in the file _conf
 
 ## Crash Triage
 
+There is a supplementary triage script that takes a crash dump file, identifies which input causes the crash, and tries to make them as small as possible. There are 2 obvious benefits to such a script. The first benefit is that we can know exactly which input causes a crash. The second benefit is that a smaller input is generally easier to analyze and debug. To run the triage script, simply provide a crash dump file and configuration file:
+
+```
+python3 triage.py <crash log file> <config file>
+```
+
+Note that the config file is required here. You MUST provide the `START_COMMAND` option, since this script will probably need to restart the broker many times.
+
+The triage algorithm is very simple, as it only removes byte blocks of sizes 1, 2, 4, 8, etc. from the input, and checks whether the new input causes a crash. If so (and if this input has never been seen before), it is added to a queue and tested further at a later point in time. We also remove bytes at random positions in the input and see if that works. Despite the simplicity, this approach works well enough and can easily reduce a payload by >= 25%.
+
 ## Bugs Discovered with FUME
 
 If you want to test FUME yourself on the same brokers we did, please refer to [this repository](https://github.com/PBearson/FUME_Targets).
