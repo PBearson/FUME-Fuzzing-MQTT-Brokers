@@ -54,7 +54,7 @@ The configuration file is defined as a list of key-value pairs, separated by a `
 The script will strip all whitespace away from the config file to parse it more easily. If, for some reason, you need whitespace in one of your options, just place a `@@` wherever you want to place the whitespace. You will probably only want this when you set `START_COMMAND`, for example:
 
 `
-START_COMMAND = node@@aedes.js # --> Parsed as 'node aedes.js'
+START_COMMAND = ./mosquitto@@-c@@mosquitto.conf@@-p@@1884 # --> Parsed as './mosquitto -c mosquitto.conf -p 1884'
 `
 
 The full list of supported configuration options can be viewed in the file _config.sample_.
