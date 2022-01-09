@@ -9,3 +9,7 @@ Currently, there may be cases where the payload can exceed `MAXIMUM_PAYLOAD_LENG
 ## ADD `MINIMUM_PAYLOAD_SIZE` and `ENFORCE_MINIMUM_PAYLOAD` options
 
 Since we already have an option for restricting how large a payload can get, a logical next step is to restrict how _small_ a payload can get (so that the Delete state does not remove too many bytes). Of course, this raises a question: How do we pad the payload when it too small? By default, we can probably just pad it with 0's. Maybe the pad byte can be selected by the user, though it probably won't make too much difference.
+
+## Add `CHOOSE_NETWORK_RESPONSE` option (alternatively, split `b` into `b1` and `b2`)
+
+Right now, when the fuzzer selects an input from the response log, the chance of selecting from the network response log is 50% (same with console response log, obviously). There is no reason why the user should not be able to set this probability. In truth, this also probably warrants a modification to the Markov model.
