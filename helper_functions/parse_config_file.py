@@ -1,23 +1,26 @@
 import globals as g
 
+
 # Parse the supplied config file
 def parse_config_file(config):
     for line in config:
 
         # Only valid key-value pairs
-        line = line.strip()
-        line = line.replace(" ","")
+        if line is None:
+            continue
 
         # The user can use @@ to re-insert spaces if they need to - for 
         # example, if the start command requires multiple words (e.g.,
         # "node <script location>")
         line = line.replace("@@", " ")
-        if len(line) == 0 or line[0] == '#':
+        if len(line) <= 1 or line[0] == '#':
             continue
-    
+
         # Split into key-value pairs
-        arg = line.split("=")
-        if len(arg) != 2:
+        arg = line.split()
+        try:
+            arg.remove('=')
+        except:
             continue
 
         if arg[0] == 'CHOOSE_MUTATION':
@@ -72,7 +75,7 @@ def parse_config_file(config):
             g.VERBOSITY = int(arg[1])
 
         elif arg[0] == 'START_COMMAND':
-            g.START_COMMAND = arg[1]
+            g.START_COMMAND = arg[1:]
 
         elif arg[0] == "TARGET_START_TIME":
             g.TARGET_START_TIME = float(arg[1])
