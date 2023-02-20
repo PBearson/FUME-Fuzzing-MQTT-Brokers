@@ -88,3 +88,7 @@ If you want to test FUME yourself on the same brokers we did, please refer to [t
 * [KMQTT broken pipe error](https://github.com/davidepianca98/KMQTT/commit/7a4e31567c1a850e86bdc0660e243e7e6e9a33cf): In KMQTT version 0.2.7 and earlier, the server may crash if it tries on send a packet (e.g., SUBACK) to a closed TCP connection.
 * [aedes malformed DISCONNECT](https://github.com/mqttjs/mqtt-packet/pull/107): In aedes 0.45.0, the server may crash if a client tries to send a malformed DISCONNECT packet.
   * This is actually due to a bug in mqtt-tools 6.9.0, a node package which aedes depends on.
+  
+  ## Credits
+  
+  FUME was developed as part of a publication for [IEEE INFOCOM 2022](https://ieeexplore.ieee.org/abstract/document/9796755). There is no license for this project. Please simply cite the original paper if you would like to give the authors credit. Several researchers contributed to FUME, and citing the publication is the best way to credit everyone.
