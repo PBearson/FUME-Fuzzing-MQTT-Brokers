@@ -89,6 +89,6 @@ If you want to test FUME yourself on the same brokers we did, please refer to [t
 * [aedes malformed DISCONNECT](https://github.com/mqttjs/mqtt-packet/pull/107): In aedes 0.45.0, the server may crash if a client tries to send a malformed DISCONNECT packet.
   * This is actually due to a bug in mqtt-tools 6.9.0, a node package which aedes depends on.
   
-  ## Credits
+## Credits
   
-  FUME was developed as part of a publication for [IEEE INFOCOM 2022](https://ieeexplore.ieee.org/abstract/document/9796755). There is no license for this project. Please simply cite the original paper if you would like to give the authors credit. Several researchers contributed to FUME, and citing the publication is the best way to credit everyone.
+FUME was developed as part of a publication for [IEEE INFOCOM 2022](https://ieeexplore.ieee.org/abstract/document/9796755). There is no license for this project. Please simply cite the original paper if you would like to give the authors credit. Several researchers contributed to FUME, and citing the publication is the best way to credit everyone.
