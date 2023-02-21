@@ -67,6 +67,7 @@ def handle_send_state():
         # Print the request queue and dump it to a file
         rq.print_queue()
         cl.dump_request_queue()
+        exit(-1)
 
     # Get the response from the target
     recv = b''
