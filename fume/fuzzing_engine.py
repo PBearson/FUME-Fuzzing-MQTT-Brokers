@@ -63,7 +63,10 @@ def handle_send_state():
 
         exit(-1)
     except TimeoutError:
-        pv.print_error("Timeout while connecting to the target with the payload %s" % binascii.hexlify(g.payload))
+        pv.print_error("Timeout while connecting to the target")
+        # Print the request queue and dump it to a file
+        rq.print_queue()
+        cl.dump_request_queue()
 
     # Get the response from the target
     recv = b''

@@ -10,6 +10,7 @@ import fume.handle_console_response as fcr
 
 # Check if the connection is a live
 def check_connection():
+    pv.verbose_print("Checking connection...")
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     while True:
         try:
