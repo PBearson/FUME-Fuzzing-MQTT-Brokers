@@ -22,7 +22,7 @@ class Markov_Model():
         self.state_response_log = Node('RESPONSE_LOG')
         self.state_connect = Node("CONNECT")
         self.state_connack = Node("CONNACK")
-        self.state_publish = Node("CONNACK")
+        self.state_publish = Node("PUBLISH")
         self.state_puback = Node("PUBACK")
         self.state_pubrec = Node("PUBREC")
         self.state_pubrel = Node("PUBREL")
