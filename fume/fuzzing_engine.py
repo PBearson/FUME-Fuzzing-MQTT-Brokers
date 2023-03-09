@@ -61,7 +61,7 @@ def handle_send_state():
             s.connect((g.TARGET_ADDR, g.TARGET_PORT))
             s.send(g.payload)
             s.close()
-        except ConnectionRefusedError:
+        except:
             pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
 
             # Print the request queue and dump it to a file
