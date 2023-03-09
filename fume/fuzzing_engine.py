@@ -55,13 +55,20 @@ def handle_send_state():
 
     # Connection failed -- we found a crash!
     except ConnectionRefusedError:
-        pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
+        # Recheck if the connection still works
+        print("Connection refused, rechecking...")
+        try:
+            s.connect((g.TARGET_ADDR, g.TARGET_PORT))
+            s.send(g.payload)
+            s.close()
+        except ConnectionRefusedError:
+            pv.print_error("No connection was found at %s:%d" % (g.TARGET_ADDR, g.TARGET_PORT))
 
-        # Print the request queue and dump it to a file
-        rq.print_queue()
-        cl.dump_request_queue()
+            # Print the request queue and dump it to a file
+            rq.print_queue()
+            cl.dump_request_queue()
 
-        exit(-1)
+            exit(-1)
     except TimeoutError:
         pv.print_error("Timeout while connecting to the target")
         # Print the request queue and dump it to a file

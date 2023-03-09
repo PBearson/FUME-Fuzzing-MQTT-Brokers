@@ -46,7 +46,7 @@ SIMILARITY_THRESHOLD = 0.3
 
 # Request queue parameters
 request_queue = []
-REQUEST_QUEUE_SIZE = 5
+REQUEST_QUEUE_SIZE = 10
 
 # Triage parameters
 TRIAGE_FAST = 1
