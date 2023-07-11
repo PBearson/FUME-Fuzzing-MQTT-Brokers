@@ -1,6 +1,7 @@
 import sys
 import random
 import math
+
 sys.path.append('generators')
 sys.path.append('helper_functions')
 sys.path.append('fume')
@@ -18,17 +19,21 @@ import fume.markov_model as mm
 import fume.fuzzing_engine as fe
 import fume.run_target as rt
 
+
 # Calculate X1 from the construction intensity
 def calculate_X1():
     g.X1 = 1 / g.CONSTRUCTION_INTENSITY
+
 
 # Calculate X2 from the fuzzing intensity
 def calculate_X2():
     g.X2 = 1 - g.FUZZING_INTENSITY
 
+
 # Calculate X3 from the fuzzing intensity
 def calculate_X3():
     g.X3 = 1 - (2 * math.log(1 + g.FUZZING_INTENSITY, 10))
+
 
 def main():
     # Try to parse the supplied config file.
@@ -69,6 +74,7 @@ def main():
 
     # Run the fuzzing loop
     fe.run_fuzzing_engine(markov_model)
+
 
 if __name__ == "__main__":
     main()

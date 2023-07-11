@@ -28,4 +28,4 @@ def handle_console_response(proc):
             # TODO we need a way to better check if we have just sent a payload to the target
             if similarity is False and type(g.payload) is bytearray:
                 g.console_response_log[line] = g.payload
-                pv.normal_print("Found new console response (%d found)" % len(g.console_response_log.keys()))
+                pv.normal_print("Found new console response: " + line.decode("utf-8").strip())

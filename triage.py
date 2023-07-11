@@ -53,7 +53,7 @@ def update_buffer(input):
         buffer.pop(0)
 
 def start_target():
-    process = subprocess.Popen(g.START_COMMAND.split(), stdout = subprocess.DEVNULL, stderr = subprocess.STDOUT)
+    process = subprocess.Popen(g.START_COMMAND, stdout = subprocess.DEVNULL, stderr = subprocess.STDOUT)
 
     # Try to connect to the target
     pv.verbose_print("Starting target...")
