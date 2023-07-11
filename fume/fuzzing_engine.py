@@ -41,9 +41,6 @@ def handle_send_state():
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.settimeout(0.05)
 
-    # TODO make this part optional
-    g.payload = g.payload[:g.MAXIMUM_PAYLOAD_LENGTH]
-
     # Connect to the target and send the payload
     try:
         pv.verbose_print("Sending payload to the target: %s" % binascii.hexlify(g.payload))
@@ -56,8 +53,10 @@ def handle_send_state():
     # Connection failed -- we found a crash!
     except ConnectionRefusedError:
         # Recheck if the connection still works
-        print("Connection refused, rechecking...")
+        pv.verbose_print("Connection refused, rechecking...")
         try:
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.settimeout(0.05)
             s.connect((g.TARGET_ADDR, g.TARGET_PORT))
             s.send(g.payload)
             s.close()
